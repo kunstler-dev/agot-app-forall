@@ -1,0 +1,19 @@
+/* Stella Nova Labs design tokens (Tailwind v4 @theme). Copy into a project's index.css. */
+@theme {
+  --color-night: #06070D;      /* page background */
+  --color-bar: #0A0C16;        /* tab bar */
+  --color-surface: #0F1120;    /* cards */
+  --color-surface-2: #171A2E;  /* inputs, raised cards */
+  --color-surface-3: #1E2240;
+  --color-line: #23274A;
+  --color-line-2: #2E335C;
+  --color-ink: #F1F2F8;        /* text */
+  --color-muted: #8E93AD;      /* secondary text */
+  --color-dim: #5E637F;
+  --color-gold: #F4C95D;       /* primary accent: star gold */
+  --color-gold-deep: #C9962E;
+  --color-nova: #8B7CFF;       /* secondary accent: nova violet */
+  --font-brand: "Cinzel", Georgia, serif;                 /* wordmark, Latin only */
+  --font-display: "Cormorant Garamond", Georgia, serif;   /* headings, has Cyrillic */
+  --font-sans: "Manrope", system-ui, sans-serif;          /* body and numbers */
+}
