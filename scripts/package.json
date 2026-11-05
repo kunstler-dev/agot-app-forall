@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Build-time tools (map generator, heraldry cache)",
+  "devDependencies": { "svgo": "^4.0.0" }
+}

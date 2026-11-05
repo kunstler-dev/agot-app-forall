@@ -80,28 +80,28 @@ def emoji_row(cells: list[dict]) -> str:
 
 # ---------------- crest of the day ----------------
 
-# blur (px at a 200px crest) and which parts of the blazon are revealed after N wrong guesses
+# What a player sees after N wrong guesses: the blazon is revealed part by part (field, then
+# ordinary, then charges), first as a faint engraving, then as a full engraving, then in colour.
 _STAGES = [
-    {"blur": 16, "parts": ("field",)},
-    {"blur": 11, "parts": ("field", "ordinary")},
-    {"blur": 8, "parts": ("field", "ordinary", "charge")},
-    {"blur": 5, "parts": ("field", "ordinary", "charge")},
-    {"blur": 2.5, "parts": ("field", "ordinary", "charge"), "words": True},
-    {"blur": 0, "parts": ("field", "ordinary", "charge"), "words": True},
+    {"parts": ("field",), "engraved": True, "fade": 0.45},
+    {"parts": ("field", "ordinary"), "engraved": True, "fade": 0.7},
+    {"parts": ("field", "ordinary", "charges"), "engraved": True, "fade": 1.0},
+    {"parts": ("field", "ordinary", "charges"), "engraved": False, "fade": 1.0},
+    {"parts": ("field", "ordinary", "charges"), "engraved": False, "fade": 1.0, "words": True},
+    {"parts": ("field", "ordinary", "charges"), "engraved": False, "fade": 1.0, "words": True},
 ]
 
 
 def crest_stage(crest: Crest, wrong: int, words: str, finished: bool) -> dict:
     """The part of the crest a player may see now. The full crest only after the game ends."""
     st = _STAGES[-1] if finished else _STAGES[min(wrong, len(_STAGES) - 1)]
-    out: dict = {"field": crest.field, "division": crest.division, "field2": crest.field2,
-                 "ordinary": "none", "ordinary_color": None, "charge": None, "charge_color": None,
-                 "charge_count": 1}
+    out = {"field": crest.field.model_dump(), "ordinary": {"type": "none", "tincture": None}, "charges": [],
+           "blazon": "", "canon_exception": crest.canon_exception}
     if "ordinary" in st["parts"]:
-        out |= {"ordinary": crest.ordinary, "ordinary_color": crest.ordinary_color}
-    if "charge" in st["parts"]:
-        out |= {"charge": crest.charge, "charge_color": crest.charge_color, "charge_count": crest.charge_count}
-    return {"crest": out, "blur": st["blur"], "words": words if st.get("words") else None}
+        out["ordinary"] = crest.ordinary.model_dump()
+    if "charges" in st["parts"]:
+        out["charges"] = [c.model_dump() for c in crest.charges]
+    return {"crest": out, "engraved": st["engraved"], "fade": st["fade"], "words": words if st.get("words") else None}
 
 
 # ---------------- points and streaks ----------------

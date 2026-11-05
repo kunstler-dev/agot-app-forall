@@ -18,6 +18,8 @@ async def test_map_respects_spoiler_level(app, client):
     assert len(low["locations"]) <= len(full["locations"])
     max_low = {x.id for x in app.state.content.locations.values() if x.spoiler <= 1}
     assert {x["id"] for x in low["locations"]} == max_low
+    assert len(low["hidden"]) == len(app.state.content.locations) - len(max_low)
+    assert all(set(h) == {"x", "y"} for h in low["hidden"])
     for p in low["paths"]:
         assert all(s["location"] in max_low for s in p["stops"])
 

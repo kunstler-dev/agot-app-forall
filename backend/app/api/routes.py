@@ -45,6 +45,25 @@ async def config(request: Request, tenant: TenantDep, content: ContentDep) -> di
     }
 
 
+@router.get("/heraldry")
+async def heraldry(content: ContentDep) -> Response:
+    """The charge library (engine + tenant). Crests themselves come with houses in /api/config."""
+    import json
+    return Response(json.dumps(content.charges, ensure_ascii=False), media_type="application/json",
+                    headers={"Cache-Control": "public, max-age=3600"})
+
+
+@router.get("/heraldry/house/{house_id}.svg", include_in_schema=False)
+async def house_crest(house_id: str, content: ContentDep, engraved: bool = False) -> Response:
+    """Pre-rendered crest (npm run build:heraldry); 404 if the cache was not built."""
+    if house_id not in content.houses:
+        raise HTTPException(404)
+    f = content.directory / "heraldry" / "rendered" / f"{house_id}{'.engraved' if engraved else ''}.svg"
+    if not f.exists():
+        raise HTTPException(404)
+    return Response(f.read_bytes(), media_type="image/svg+xml", headers={"Cache-Control": "public, max-age=86400"})
+
+
 @router.get("/content/map.svg", include_in_schema=False)
 async def map_svg(content: ContentDep) -> Response:
     f = (content.directory / content.map.file).resolve()

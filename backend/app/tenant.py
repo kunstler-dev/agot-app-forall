@@ -21,9 +21,9 @@ class Link(BaseModel):
 
 
 class Theme(BaseModel):
-    # Defaults are the Stella Nova Labs brand; a tenant may override the two accents
-    accent: str = "#F4C95D"
-    accent2: str = "#8B7CFF"
+    # Defaults are the engine's sealing wax and gilt; a tenant may tint the two accents
+    accent: str = "#B8322A"
+    accent2: str = "#C9A24A"
 
 
 class SpoilerLevel(BaseModel):
@@ -65,6 +65,8 @@ class GeoCfg(BaseModel):
     perfect_radius: float = 12.0
     # Daily round uses only clues up to this spoiler level (it is the same for everyone)
     daily_max_spoiler: int = 1
+    # Distances are shown in leagues: map units × this factor
+    leagues_per_unit: float = 1.0
 
 
 class BotCfg(BaseModel):

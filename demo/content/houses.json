@@ -10,12 +10,26 @@
   "description": "Древний род северных лордов. Держат перевалы и помнят каждую зиму поимённо.",
   "quiz_text": "Ты держишь слово и не бросаешь своих. Тебе не нужен блеск — нужен порядок, в котором каждый знает своё место у огня.",
   "crest": {
-   "field": "azure",
-   "charge": "bear",
-   "charge_color": "argent",
-   "ordinary": "bordure",
-   "ordinary_color": "argent",
-   "blazon": "Серебряный медведь на лазури, серебряная кайма"
+   "field": {
+    "division": "plain",
+    "tinctures": [
+     "azure"
+    ]
+   },
+   "ordinary": {
+    "type": "bordure",
+    "tincture": "argent"
+   },
+   "charges": [
+    {
+     "charge": "bear_rampant",
+     "tincture": "argent",
+     "count": 1,
+     "arrangement": "single"
+    }
+   ],
+   "blazon": "Серебряный медведь на лазури, серебряная кайма",
+   "canon_exception": false
   }
  },
  {
@@ -29,10 +43,26 @@
   "description": "Лесные лорды, хранители старых троп. Говорят, их совы приносят вести быстрее воронов.",
   "quiz_text": "Ты замечаешь то, что другие пропускают. Тихий ум, терпение и умение ждать — твоё главное оружие.",
   "crest": {
-   "field": "sable",
-   "charge": "owl",
-   "charge_color": "argent",
-   "blazon": "Серебряная сова на чёрном"
+   "field": {
+    "division": "plain",
+    "tinctures": [
+     "sable"
+    ]
+   },
+   "ordinary": {
+    "type": "none",
+    "tincture": null
+   },
+   "charges": [
+    {
+     "charge": "owl",
+     "tincture": "argent",
+     "count": 1,
+     "arrangement": "single"
+    }
+   ],
+   "blazon": "Серебряная сова на чёрном",
+   "canon_exception": false
   }
  },
  {
@@ -46,10 +76,26 @@
   "description": "Род зодчих и рудокопов. Их крепости строились веками и ни разу не пали.",
   "quiz_text": "Ты строишь на века. Упрямство, ремесло и верность традиции делают тебя опорой для других.",
   "crest": {
-   "field": "or",
-   "charge": "tower",
-   "charge_color": "gules",
-   "blazon": "Червлёная башня на золоте"
+   "field": {
+    "division": "plain",
+    "tinctures": [
+     "or"
+    ]
+   },
+   "ordinary": {
+    "type": "none",
+    "tincture": null
+   },
+   "charges": [
+    {
+     "charge": "tower",
+     "tincture": "gules",
+     "count": 1,
+     "arrangement": "single"
+    }
+   ],
+   "blazon": "Червлёная башня на золоте",
+   "canon_exception": false
   }
  },
  {
@@ -63,12 +109,27 @@
   "description": "Владыки бродов и мельниц. Мирейны богаты не золотом, а дружбой с соседями.",
   "quiz_text": "Ты гибок и дипломатичен. Там, где другие ломают стены, ты находишь брод.",
   "crest": {
-   "field": "vert",
-   "division": "per_fess",
-   "field2": "azure",
-   "charge": "heron",
-   "charge_color": "argent",
-   "blazon": "Серебряная цапля на поле, рассечённом зеленью и лазурью"
+   "field": {
+    "division": "per_fess",
+    "tinctures": [
+     "vert",
+     "azure"
+    ]
+   },
+   "ordinary": {
+    "type": "none",
+    "tincture": null
+   },
+   "charges": [
+    {
+     "charge": "heron",
+     "tincture": "argent",
+     "count": 1,
+     "arrangement": "single"
+    }
+   ],
+   "blazon": "Серебряная цапля на поле, рассечённом зеленью и лазурью",
+   "canon_exception": false
   }
  },
  {
@@ -82,10 +143,26 @@
   "description": "Летописцы и законники. В их башне хранится Свод Марок — первые законы края.",
   "quiz_text": "Для тебя знание — сила, а честное слово — закон. Ты споришь, пока не докопаешься до истины.",
   "crest": {
-   "field": "cendree",
-   "charge": "raven",
-   "charge_color": "sable",
-   "blazon": "Чёрный ворон на пепельном поле"
+   "field": {
+    "division": "plain",
+    "tinctures": [
+     "argent"
+    ]
+   },
+   "ordinary": {
+    "type": "none",
+    "tincture": null
+   },
+   "charges": [
+    {
+     "charge": "raven",
+     "tincture": "sable",
+     "count": 1,
+     "arrangement": "single"
+    }
+   ],
+   "blazon": "Чёрный ворон на серебре",
+   "canon_exception": false
   }
  },
  {
@@ -99,10 +176,26 @@
   "description": "Южные князья, поэты и мореходы. Их праздники длятся неделями, а обиды — поколениями.",
   "quiz_text": "Ты горишь ярко и ведёшь за собой. Страсть, щедрость и смелость — но и вспыльчивость.",
   "crest": {
-   "field": "gules",
-   "charge": "sun",
-   "charge_color": "or",
-   "blazon": "Золотое солнце на червлёном"
+   "field": {
+    "division": "plain",
+    "tinctures": [
+     "gules"
+    ]
+   },
+   "ordinary": {
+    "type": "none",
+    "tincture": null
+   },
+   "charges": [
+    {
+     "charge": "sun_in_splendour",
+     "tincture": "or",
+     "count": 1,
+     "arrangement": "single"
+    }
+   ],
+   "blazon": "Золотое солнце на червлёном",
+   "canon_exception": false
   }
  },
  {
@@ -116,12 +209,27 @@
   "description": "Островные капитаны. Никто не знает течений лучше, и никто не торгуется жёстче.",
   "quiz_text": "Ты свободен и не терпишь клетки. Риск и ветер в лицо тебе милее тёплой постели.",
   "crest": {
-   "field": "argent",
-   "division": "barry",
-   "field2": "azure",
-   "charge": "ship",
-   "charge_color": "sable",
-   "blazon": "Чёрный корабль на поле с волнами серебра и лазури"
+   "field": {
+    "division": "barry",
+    "tinctures": [
+     "argent",
+     "azure"
+    ]
+   },
+   "ordinary": {
+    "type": "none",
+    "tincture": null
+   },
+   "charges": [
+    {
+     "charge": "lymphad",
+     "tincture": "sable",
+     "count": 1,
+     "arrangement": "single"
+    }
+   ],
+   "blazon": "Чёрный корабль на поле с волнами серебра и лазури",
+   "canon_exception": false
   }
  },
  {
@@ -135,12 +243,26 @@
   "description": "Молодой дом пограничных капитанов. Добыли титул смекалкой, а не кровью.",
   "quiz_text": "Ты находчив и честолюбив. Правила — это советы, а победа любит тех, кто думает на шаг вперёд.",
   "crest": {
-   "field": "tenne",
-   "charge": "fox",
-   "charge_color": "argent",
-   "ordinary": "chief",
-   "ordinary_color": "sable",
-   "blazon": "Серебряная лиса на оранжевом, чёрная глава"
+   "field": {
+    "division": "plain",
+    "tinctures": [
+     "tenne"
+    ]
+   },
+   "ordinary": {
+    "type": "chief",
+    "tincture": "argent"
+   },
+   "charges": [
+    {
+     "charge": "fox_head",
+     "tincture": "argent",
+     "count": 1,
+     "arrangement": "single"
+    }
+   ],
+   "blazon": "Серебряная лиса на оранжевом, серебряная глава",
+   "canon_exception": false
   }
  }
 ]

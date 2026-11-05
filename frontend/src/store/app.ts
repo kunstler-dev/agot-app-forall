@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 
+import { useHeraldry } from '../heraldry/store'
 import { api, type Config, type Me } from '../lib/api'
 import { setTexts } from '../lib/texts'
 
@@ -23,8 +24,9 @@ type State = {
 
 function applyTheme(cfg: Config) {
   const r = document.documentElement.style
-  r.setProperty('--color-gold', cfg.tenant.theme.accent)
-  r.setProperty('--color-nova', cfg.tenant.theme.accent2)
+  // a tenant may tint the two accents; the defaults are the engine's wax and gilt
+  if (cfg.tenant.theme.accent && cfg.tenant.theme.accent !== '#B8322A') r.setProperty('--color-wax', cfg.tenant.theme.accent)
+  if (cfg.tenant.theme.accent2 && cfg.tenant.theme.accent2 !== '#C9A24A') r.setProperty('--color-gilt', cfg.tenant.theme.accent2)
   document.title = cfg.tenant.app_name
   setTexts(cfg.tenant.texts)
 }
@@ -57,7 +59,7 @@ export const useApp = create<State>((set, get) => ({
   },
   load: async () => {
     try {
-      const [config, me] = await Promise.all([api.config(), api.me()])
+      const [config, me] = await Promise.all([api.config(), api.me(), useHeraldry.getState().load()])
       applyTheme(config)
       set({ config, me, error: null, onboarding: needsOnboarding(me) })
     } catch (e) {

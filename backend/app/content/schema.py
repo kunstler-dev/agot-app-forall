@@ -8,6 +8,7 @@ Fields marked `verify: true` are facts the author was not sure about and wants a
 from __future__ import annotations
 
 import json
+import logging
 import re
 from pathlib import Path
 from typing import Literal
@@ -17,48 +18,82 @@ from pydantic import BaseModel, Field, model_validator
 SLUG = r"^[a-z0-9][a-z0-9_-]*$"
 HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
 
-# Heraldic tinctures the crest renderer knows (frontend/src/lib/heraldry.ts has the same table)
-TINCTURES = {"or", "argent", "gules", "azure", "vert", "sable", "purpure", "tenne", "sanguine",
-             "bleu", "rose", "cendree", "murrey", "ochre"}
-DIVISIONS = {"plain", "per_pale", "per_fess", "per_bend", "per_bend_sinister", "quarterly",
-             "per_saltire", "per_chevron", "gyronny", "paly", "barry", "chequy", "bendy"}
-ORDINARIES = {"none", "fess", "pale", "bend", "bend_sinister", "chevron", "cross", "saltire",
-              "chief", "bordure", "pile", "orle"}
+# Heraldic tinctures the renderer knows (frontend/src/heraldry/render.ts has the same table)
+METALS = {"or", "argent"}
+COLOURS = {"gules", "azure", "vert", "sable", "purpure", "tenne", "sanguine", "murrey", "bleu_celeste", "rose",
+           "cendree", "brunatre"}
+TINCTURES = METALS | COLOURS
+DIVISIONS = {"plain", "per_pale", "per_fess", "per_bend", "per_bend_sinister", "quarterly", "per_saltire",
+             "per_chevron", "gyronny", "paly", "barry", "chequy", "bendy"}
+ORDINARIES = {"none", "chief", "fess", "pale", "bend", "chevron", "cross", "saltire", "bordure", "pile"}
+ARRANGEMENTS = {"single", "two_one", "in_pale", "in_fess", "semy"}
+
+ENGINE_CHARGES = Path(__file__).resolve().parent / "charges.json"
+log = logging.getLogger("fandom.content")
 
 
-def _color_ok(c: str | None) -> bool:
-    return c is None or c in TINCTURES or bool(HEX.match(c))
+def _tincture_ok(t: str | None) -> bool:
+    return t is None or t in TINCTURES or bool(HEX.match(t))
+
+
+def is_metal(t: str) -> bool:
+    return t in METALS
+
+
+class BlazonField(BaseModel):
+    division: str = "plain"
+    tinctures: list[str] = Field(min_length=1, max_length=2)
+
+
+class BlazonOrdinary(BaseModel):
+    type: str = "none"
+    tincture: str | None = None
+
+
+class BlazonCharge(BaseModel):
+    charge: str
+    tincture: str
+    count: int = Field(1, ge=1, le=12)
+    arrangement: str = "single"
 
 
 class Crest(BaseModel):
-    """Blazon-like description, rendered as an original SVG by the frontend."""
+    """A blazon: the crest as data. Every crest is drawn by one renderer."""
 
-    field: str
-    division: str = "plain"
-    field2: str | None = None
-    ordinary: str = "none"
-    ordinary_color: str | None = None
-    charge: str | None = None
-    charge_color: str | None = None
-    charge_count: int = Field(1, ge=1, le=3)
+    field: BlazonField
+    ordinary: BlazonOrdinary = BlazonOrdinary()
+    charges: list[BlazonCharge] = []
     blazon: str = ""  # human-readable description
+    # the canon breaks the tincture rule on purpose (metal on metal / colour on colour)
+    canon_exception: bool = False
 
     @model_validator(mode="after")
     def _check(self) -> Crest:
-        for c in (self.field, self.field2, self.ordinary_color, self.charge_color):
-            if not _color_ok(c):
-                raise ValueError(f"unknown tincture {c!r}")
-        if self.division not in DIVISIONS:
-            raise ValueError(f"unknown division {self.division!r}")
-        if self.ordinary not in ORDINARIES:
-            raise ValueError(f"unknown ordinary {self.ordinary!r}")
-        if self.division != "plain" and not self.field2:
-            raise ValueError("a divided field needs field2")
-        if self.ordinary != "none" and not self.ordinary_color:
-            raise ValueError("an ordinary needs ordinary_color")
-        if self.charge and not self.charge_color:
-            raise ValueError("a charge needs charge_color")
+        ts = [*self.field.tinctures, self.ordinary.tincture, *(c.tincture for c in self.charges)]
+        for t in ts:
+            if not _tincture_ok(t):
+                raise ValueError(f"unknown tincture {t!r}")
+        if self.field.division not in DIVISIONS:
+            raise ValueError(f"unknown division {self.field.division!r}")
+        if self.field.division != "plain" and len(self.field.tinctures) != 2:
+            raise ValueError("a divided field needs two tinctures")
+        if self.ordinary.type not in ORDINARIES:
+            raise ValueError(f"unknown ordinary {self.ordinary.type!r}")
+        if self.ordinary.type != "none" and not self.ordinary.tincture:
+            raise ValueError("an ordinary needs a tincture")
+        for c in self.charges:
+            if c.arrangement not in ARRANGEMENTS:
+                raise ValueError(f"unknown arrangement {c.arrangement!r}")
         return self
+
+    def tincture_problems(self) -> list[str]:
+        """Metal on metal or colour on colour (only checked on a plain field; custom hex counts as colour)."""
+        if self.field.division != "plain":
+            return []
+        base = self.field.tinctures[0]
+        clash = [] if self.ordinary.type == "none" else [("ordinary", self.ordinary.tincture)]
+        clash += [(c.charge, c.tincture) for c in self.charges]
+        return [f"{what} {t} on {base}" for what, t in clash if t and is_metal(t) == is_metal(base)]
 
 
 class House(BaseModel):
@@ -208,6 +243,7 @@ class Content:
         self.clues = {c.id: c for c in clues}
         self.quiz = quiz
         self.events = events
+        self.charges = self.load_charges(directory)
         self._validate()
 
     # ---------- loading ----------
@@ -270,6 +306,15 @@ class Content:
         return {"characters": self.characters, "houses": self.houses, "locations": self.locations,
                 "clues": self.clues}[kind]
 
+    @staticmethod
+    def load_charges(directory: Path) -> dict[str, dict]:
+        """Engine charges plus the tenant's own (content/heraldry/charges.json); the tenant wins on name clashes."""
+        lib = json.loads(ENGINE_CHARGES.read_text(encoding="utf-8"))
+        own = Path(directory) / "heraldry" / "charges.json"
+        if own.exists():
+            lib |= json.loads(own.read_text(encoding="utf-8"))
+        return lib
+
     # ---------- validation ----------
 
     def _validate(self) -> None:
@@ -320,6 +365,12 @@ class Content:
                 errors.append(f"clue {c.id}: unknown location {c.location!r}")
             if c.house and c.house not in self.houses:
                 errors.append(f"clue {c.id}: unknown house {c.house!r}")
+        for h in self.houses.values():
+            errors += [f"house {h.id}: unknown charge {c.charge!r}" for c in h.crest.charges if c.charge not in self.charges]
+            problems = h.crest.tincture_problems()
+            if problems and not h.crest.canon_exception:
+                log.warning("house %s breaks the tincture rule: %s (set canon_exception if intended)",
+                            h.id, "; ".join(problems))
         quiz_houses = {h.id for h in self.houses.values() if h.quiz}
         if len(quiz_houses) < 4:
             errors.append("quiz needs at least 4 houses with quiz=true")

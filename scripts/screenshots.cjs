@@ -35,10 +35,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
     await page.getByText(text, { exact: false, ...opts }).first().click()
   }
 
-  await page.goto(`${base}/?dev=${uid}`)
-  await sleep(700)
+  const theme = process.env.THEME ? `&theme=${process.env.THEME}` : ''
+  await page.goto(`${base}/?dev=${uid}${theme}`)
+  await sleep(450)
   await shot('splash')
-  await sleep(1800)
+  await sleep(900)
 
   // onboarding: the house quiz
   if (await page.getByText('Начать').count()) {
@@ -47,15 +48,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
     await sleep(300)
     await shot('quiz-question')
     for (let i = 0; i < 20; i++) {
-      const answers = page.locator('button.press.rounded-2xl')
+      const answers = page.locator('ul li button.press')
       if (!(await answers.count())) break
       await answers.nth(i % 3).click()
       await sleep(320)
-      if (await page.getByText('Твой дом').count()) break
+      if (await page.getByText('ваш дом').count()) break
     }
     await sleep(800)
     await shot('quiz-result')
-    await click('В приложение')
+    await click('В архив')
   }
 
   // today: character of the day
@@ -63,12 +64,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
   await shot('daily-empty')
   const names = await page.evaluate(async (u) => (await fetch('/api/daily/characters', { headers: { Authorization: `tma dev:${u}` } })).json(), uid)
   for (const c of names.slice(0, 5)) {
-    await page.getByPlaceholder('Начни вводить имя').fill(c.name.slice(0, 4))
+    await page.getByPlaceholder('Имя персонажа').fill(c.name.slice(0, 4))
     await sleep(250)
     const opt = page.locator('button', { hasText: c.name }).first()
     if (await opt.count()) await opt.click()
     await sleep(900)
-    if (await page.getByText('Поделиться без спойлеров').count()) break
+    if (await page.getByText('Отправить без спойлеров').count()) break
   }
   await shot('daily-guesses')
   await page.mouse.wheel(0, 600)
@@ -83,7 +84,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
   // predictions
   await click('Прогнозы', { exact: true })
   await sleep(700)
-  const opt = page.locator('button.press.relative.overflow-hidden').first()
+  const opt = page.locator('article ul li button').first()
   if (await opt.count()) await opt.click()
   await sleep(600)
   await shot('predictions')
@@ -106,7 +107,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
   }
   await click('Пути')
   await sleep(500)
-  const p = page.locator('button.press.flex.items-center.justify-between').first()
+  const p = page.locator('ul li button.press').first()
   if (await p.count()) await p.click()
   await sleep(600)
   await shot('map-path')
@@ -118,7 +119,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
   await page.mouse.click(width / 2, height / 2)
   await sleep(300)
   await shot('geo-aim')
-  await click('Здесь!')
+  await click('Отметить здесь')
   await sleep(900)
   await shot('geo-result')
 
@@ -151,8 +152,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
     j.subscription = { ...j.subscription, ok: false, channel: j.subscription.channel || '@your_channel', title: j.subscription.title || 'Канал автора', url: 'https://t.me/' }
     await route.fulfill({ response: r, json: j })
   })
-  await page.goto(`${base}/?dev=${uid}`)
-  await sleep(2600)
+  await page.goto(`${base}/?dev=${uid}${theme}`)
+  await sleep(1600)
   await shot('gate')
 
   await browser.close()

@@ -44,6 +44,8 @@ async def world_map(u: Player, s: Session, content: ContentDep, tenant: TenantDe
         "level": lv,
         "map": content.map.model_dump(),
         "houses": layer,
+        # places beyond the spoiler level: only a blot of paper, no name
+        "hidden": [{"x": x.x, "y": x.y} for x in content.locations.values() if x.spoiler > lv],
         "my_house": u.house,
         "locations": [{
             "id": x.id, "name": x.name, "x": x.x, "y": x.y, "kind": x.kind, "region": x.region, "rank": x.rank,

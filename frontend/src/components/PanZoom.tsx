@@ -161,7 +161,7 @@ export function PanZoom({
                 type="button"
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={() => zoomAt(box.current!.clientWidth / 2, box.current!.clientHeight / 2, f as number)}
-                className="press h-10 w-10 rounded-xl border border-line-2 bg-surface/90 text-[20px] font-bold text-ink backdrop-blur"
+                className="press h-9 w-9 rounded-sm border border-[#2A2117] bg-[#EFE6D2] text-[20px] leading-none text-[#2A2117]"
               >
                 {l}
               </button>

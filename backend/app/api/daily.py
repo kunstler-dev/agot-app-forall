@@ -164,8 +164,10 @@ async def daily_state(request: Request, u: Player, s: Session) -> dict:
 
 @router.get("/characters")
 async def character_names(content: ContentDep, u: Player) -> list[dict]:
-    """Names for autocomplete (attributes are not sent: the grid is computed on the server)."""
-    return [{"id": c.id, "name": c.name, "aliases": c.aliases} for c in
+    """Names for autocomplete with the house for a small crest (other attributes stay on the server)."""
+    return [{"id": c.id, "name": c.name, "aliases": c.aliases,
+             "house": h if isinstance(h := c.attrs.get(content.crest_attr), str) and h in content.houses else None}
+            for c in
             sorted(content.characters.values(), key=lambda c: c.name)]
 
 

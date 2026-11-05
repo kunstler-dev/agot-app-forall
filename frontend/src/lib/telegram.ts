@@ -13,6 +13,8 @@ type WebApp = {
   initDataUnsafe?: { user?: { photo_url?: string } }
   version?: string
   platform?: string
+  colorScheme?: 'light' | 'dark'
+  onEvent?: (e: string, cb: () => void) => void
   ready: () => void
   expand: () => void
   disableVerticalSwipes?: () => void
@@ -37,14 +39,48 @@ declare global {
 
 export const tg: WebApp | undefined = window.Telegram?.WebApp?.initData ? window.Telegram.WebApp : undefined
 
-export function initTelegram(bg = '#06070D') {
+const PAPER = { dark: '#16130F', light: '#EFE6D2' }
+
+const THEME_KEY = 'fk.theme'
+
+/** "Night in the Citadel" is the default for everyone; "Parchment" only if the player chose it
+ * in the profile (or ?theme=light for screenshots). */
+export function currentScheme(): 'light' | 'dark' {
+  const q = new URLSearchParams(location.search).get('theme')
+  if (q === 'light' || q === 'dark') return q
+  try {
+    if (localStorage.getItem(THEME_KEY) === 'light') return 'light'
+  } catch {
+    /* storage may be blocked */
+  }
+  return 'dark'
+}
+
+export function setScheme(scheme: 'light' | 'dark') {
+  try {
+    localStorage.setItem(THEME_KEY, scheme)
+  } catch {
+    /* storage may be blocked */
+  }
+  applyScheme()
+}
+
+export function applyScheme() {
+  const scheme = currentScheme()
+  document.documentElement.dataset.theme = scheme
+  const bg = PAPER[scheme]
+  tg?.setHeaderColor?.(bg)
+  tg?.setBackgroundColor?.(bg)
+  tg?.setBottomBarColor?.(bg)
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', bg)
+}
+
+export function initTelegram() {
+  applyScheme()
   if (!tg) return
   tg.ready()
   tg.expand()
   tg.disableVerticalSwipes?.()
-  tg.setHeaderColor?.(bg)
-  tg.setBackgroundColor?.(bg)
-  tg.setBottomBarColor?.(bg)
 }
 
 export function openTelegram(url: string) {

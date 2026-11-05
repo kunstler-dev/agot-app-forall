@@ -54,13 +54,17 @@ def test_compare_hit_partial_miss_and_arrows():
 
 
 def test_crest_stages_reveal_gradually():
-    crest = Crest(field="azure", charge="bear", charge_color="argent", ordinary="bordure", ordinary_color="argent")
+    crest = Crest.model_validate({"field": {"tinctures": ["azure"]}, "ordinary": {"type": "bordure", "tincture": "argent"},
+                                  "charges": [{"charge": "bear_rampant", "tincture": "argent"}]})
     s0 = D.crest_stage(crest, 0, "words", False)
-    assert s0["crest"]["charge"] is None and s0["crest"]["ordinary"] == "none" and s0["words"] is None
+    assert s0["crest"]["charges"] == [] and s0["crest"]["ordinary"]["type"] == "none" and s0["words"] is None
+    assert s0["engraved"] and s0["fade"] < 1
     s2 = D.crest_stage(crest, 2, "words", False)
-    assert s2["crest"]["charge"] == "bear" and s2["blur"] < s0["blur"]
+    assert s2["crest"]["charges"][0]["charge"] == "bear_rampant" and s2["engraved"]
+    assert not D.crest_stage(crest, 3, "words", False)["engraved"]
     assert D.crest_stage(crest, 4, "words", False)["words"] == "words"
-    assert D.crest_stage(crest, 0, "words", True)["blur"] == 0
+    done = D.crest_stage(crest, 0, "words", True)
+    assert not done["engraved"] and done["crest"]["ordinary"]["type"] == "bordure"
 
 
 def test_streaks():
@@ -110,7 +114,7 @@ async def test_answer_is_never_sent_before_the_end(app, client):
         assert target.name not in r.text
     # the names list for autocomplete carries no attributes
     names = (await client.get("/api/daily/characters", headers=h)).json()
-    assert set(names[0]) == {"id", "name", "aliases"}
+    assert set(names[0]) == {"id", "name", "aliases", "house"}
 
 
 async def test_hints_unlock_and_game_ends(app, client):
@@ -162,7 +166,7 @@ async def test_crest_of_the_day(app, client):
     h = auth(15)
     first = (await client.get("/api/daily", headers=h)).json()["crest"]
     answer = await answer_of(app, "crest")
-    assert answer not in json.dumps(first) and first["stage"]["crest"]["charge"] is None
+    assert answer not in json.dumps(first) and first["stage"]["crest"]["charges"] == []
     wrong = [x for x in sorted(app.state.content.houses) if x != answer][0]
     data = (await client.post("/api/daily/crest/guess", json={"house": wrong}, headers=h)).json()["crest"]
     assert data["guesses"][0]["correct"] is False and data["answer"] is None

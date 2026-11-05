@@ -1,19 +1,39 @@
-/* Stella Nova Labs design tokens (Tailwind v4 @theme). Copy into a project's index.css. */
+/* Stella Nova Labs design tokens (Tailwind v4). Night is the default; [data-theme="light"] is Parchment. */
 @theme {
-  --color-night: #06070D;      /* page background */
-  --color-bar: #0A0C16;        /* tab bar */
-  --color-surface: #0F1120;    /* cards */
-  --color-surface-2: #171A2E;  /* inputs, raised cards */
-  --color-surface-3: #1E2240;
-  --color-line: #23274A;
-  --color-line-2: #2E335C;
-  --color-ink: #F1F2F8;        /* text */
-  --color-muted: #8E93AD;      /* secondary text */
-  --color-dim: #5E637F;
-  --color-gold: #F4C95D;       /* primary accent: star gold */
-  --color-gold-deep: #C9962E;
-  --color-nova: #8B7CFF;       /* secondary accent: nova violet */
-  --font-brand: "Cinzel", Georgia, serif;                 /* wordmark, Latin only */
-  --font-display: "Cormorant Garamond", Georgia, serif;   /* headings, has Cyrillic */
-  --font-sans: "Manrope", system-ui, sans-serif;          /* body and numbers */
+  --color-paper: #16130F;
+  --color-paper-2: #1F1B15;
+  --color-ink: #E8DFCC;
+  --color-ink-muted: #A39883;
+  --color-rule: rgba(232, 223, 204, 0.18);
+  --color-rule-strong: rgba(232, 223, 204, 0.34);
+  --color-wax: #B8322A;
+  --color-gilt: #C9A24A;
+  --color-verdigris: #4F8A7A;
+  --color-ochre: #C08A2E;
+  --color-slate: #4A463F;
+  --color-on-wax: #F4EBDB;
+  --font-sans: "Alegreya", "Georgia", serif;
+  --font-sc: "Alegreya SC", "Alegreya", "Georgia", serif;
+  --text-xs: 13px;
+  --text-sm: 15px;
+  --text-base: 17px;
+  --text-lg: 21px;
+  --text-xl: 28px;
+  --text-2xl: 36px;
+  --radius-sm: 2px;
+}
+
+[data-theme="light"] {
+  --color-paper: #EFE6D2;
+  --color-paper-2: #E6DBC2;
+  --color-ink: #2A2117;
+  --color-ink-muted: #6E604B;
+  --color-rule: rgba(42, 33, 23, 0.2);
+  --color-rule-strong: rgba(42, 33, 23, 0.38);
+  --color-wax: #9E2A22;
+  --color-gilt: #8C6A1F;
+  --color-verdigris: #2F6B5C;
+  --color-ochre: #9A6B1C;
+  --color-slate: #8B8272;
+  --color-on-wax: #F7EFDF;
 }

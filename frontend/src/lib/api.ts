@@ -1,4 +1,4 @@
-import type { CrestSpec } from './heraldry'
+import type { Blazon } from '../heraldry/render'
 import { authHeader } from './telegram'
 
 export class ApiError extends Error {
@@ -41,12 +41,12 @@ export type Tenant = {
   texts: Record<string, string>
   spoiler_levels: SpoilerLevel[]
   predictions: { current_season: string; season_label: string; base_points: number; bold_threshold: number; bold_multiplier: number }
-  geo: { rounds: number; max_score: number }
+  geo: { rounds: number; max_score: number; leagues_per_unit: number }
   daily: { max_attempts: number; hint_quote_after: number; hint_crest_after: number; crest_attempts: number }
   app_link: string
   disclaimer: string
 }
-export type HouseRef = { id: string; name: string; words: string; region: string; seat: string; great: boolean; crest: CrestSpec }
+export type HouseRef = { id: string; name: string; words: string; region: string; seat: string; great: boolean; crest: Blazon }
 export type MapMeta = { file: string; width: number; height: number; title: string }
 export type Config = {
   tenant: Tenant
@@ -77,7 +77,7 @@ export type CharacterDaily = {
   guesses: { id: string; name: string; cells: Cell[]; correct: boolean }[]
   solved: boolean
   finished: boolean
-  hints: { quote: string | null; crest: CrestSpec | null }
+  hints: { quote: string | null; crest: Blazon | null }
   answer: { id: string; name: string; bio: string; house: string | null } | null
   points?: number
   stats: DailyStats
@@ -87,12 +87,12 @@ export type CrestDaily = {
   guesses: { house: string; name: string; correct: boolean }[]
   solved: boolean
   finished: boolean
-  stage: { crest: CrestSpec; blur: number; words: string | null }
-  answer: { house: string; name: string; words: string; crest: CrestSpec } | null
+  stage: { crest: Blazon; engraved: boolean; fade: number; words: string | null }
+  answer: { house: string; name: string; words: string; crest: Blazon } | null
   stats: DailyStats
 }
 export type Daily = { day: string; number: number; next_ms: number; character: CharacterDaily; crest: CrestDaily }
-export type NameRef = { id: string; name: string; aliases: string[] }
+export type NameRef = { id: string; name: string; aliases: string[]; house?: string | null }
 
 export type QuizQ = { id: string; text: string; answers: string[] }
 export type Quiz = { title: string; intro: string; questions: QuizQ[] }
@@ -101,7 +101,7 @@ export type QuizResult = {
   name: string
   words: string
   text: string
-  crest: CrestSpec
+  crest: Blazon
   ranking: { house: string; name: string; pct: number; score: number }[]
 }
 export type HouseStats = { total: number; houses: Record<string, number> }
@@ -141,8 +141,8 @@ export type MapLocation = {
   characters: { id: string; name: string }[]
 }
 export type MapPath = { character: string; name: string; stops: { location: string; note: string }[] }
-export type HousePin = { house: string; name: string; words: string; location: string; x: number; y: number; count: number; pct: number; crest: CrestSpec }
-export type WorldMap = { level: number; map: MapMeta; locations: MapLocation[]; paths: MapPath[]; houses: { total: number; items: HousePin[] }; my_house: string | null }
+export type HousePin = { house: string; name: string; words: string; location: string; x: number; y: number; count: number; pct: number; crest: Blazon }
+export type WorldMap = { level: number; map: MapMeta; locations: MapLocation[]; paths: MapPath[]; hidden: { x: number; y: number }[]; houses: { total: number; items: HousePin[] }; my_house: string | null }
 export type GeoResult = { x: number; y: number; score: number; distance: number; answer: { id: string; name: string; x: number; y: number } }
 export type GeoSession = {
   id: number
@@ -153,7 +153,7 @@ export type GeoSession = {
   max_score: number
   total: number
   finished: boolean
-  clue: { kind: string; text: string; crest: CrestSpec | null } | null
+  clue: { kind: string; text: string; crest: Blazon | null } | null
   results: GeoResult[]
   last?: GeoResult
 }

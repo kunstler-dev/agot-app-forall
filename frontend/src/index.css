@@ -1,123 +1,154 @@
 @import "tailwindcss";
+@import "./fonts.css";
+@import "./paper.css";
 
-/* Stella Nova Labs design tokens: deep night, cold blue-violet surfaces, star gold and nova violet.
-   A tenant may override --color-gold / --color-nova at runtime (tenant.json theme). */
+/* Citadel / Stella Nova design tokens: paper, ink, sealing wax.
+   Dark theme "Night in the Citadel" is the default; [data-theme="light"] is "Parchment".
+   A tenant may override --color-wax and --color-gilt (tenant.json theme). */
 @theme {
-  --color-night: #06070D;
-  --color-bar: #0A0C16;
-  --color-surface: #0F1120;
-  --color-surface-2: #171A2E;
-  --color-surface-3: #1E2240;
-  --color-line: #23274A;
-  --color-line-2: #2E335C;
-  --color-ink: #F1F2F8;
-  --color-muted: #8E93AD;
-  --color-dim: #5E637F;
-  --color-gold: #F4C95D;
-  --color-gold-deep: #C9962E;
-  --color-nova: #8B7CFF;
-  --color-hit: #4CB27A;
-  --color-partial: #D9A93B;
-  --color-miss: #2A2E4A;
-  --color-danger: #E26D6D;
-  --color-parchment: #E9D9B4;
-  --font-display: "Cormorant Garamond", "Cormorant", Georgia, serif;
-  --font-brand: "Cinzel", "Cormorant Garamond", Georgia, serif;
-  --font-sans: "Manrope", system-ui, sans-serif;
+  --color-paper: #16130F;
+  --color-paper-2: #1F1B15;
+  --color-ink: #E8DFCC;
+  --color-ink-muted: #A39883;
+  --color-rule: rgba(232, 223, 204, 0.18);
+  --color-rule-strong: rgba(232, 223, 204, 0.34);
+  --color-wax: #B8322A;
+  --color-gilt: #C9A24A;
+  --color-verdigris: #4F8A7A;
+  --color-ochre: #C08A2E;
+  --color-slate: #4A463F;
+  --color-on-wax: #F4EBDB;
+  --font-sans: "Alegreya", "Georgia", serif;
+  --font-sc: "Alegreya SC", "Alegreya", "Georgia", serif;
+  --text-xs: 13px;
+  --text-sm: 15px;
+  --text-base: 17px;
+  --text-lg: 21px;
+  --text-xl: 28px;
+  --text-2xl: 36px;
+  --radius-sm: 2px;
+}
+
+[data-theme="light"] {
+  --color-paper: #EFE6D2;
+  --color-paper-2: #E6DBC2;
+  --color-ink: #2A2117;
+  --color-ink-muted: #6E604B;
+  --color-rule: rgba(42, 33, 23, 0.2);
+  --color-rule-strong: rgba(42, 33, 23, 0.38);
+  --color-wax: #9E2A22;
+  --color-gilt: #8C6A1F;
+  --color-verdigris: #2F6B5C;
+  --color-ochre: #9A6B1C;
+  --color-slate: #8B8272;
+  --color-on-wax: #F7EFDF;
 }
 
 @layer base {
-html,
-body,
-#root {
-  height: 100%;
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    margin: 0;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.45;
+    font-variant-numeric: oldstyle-nums;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+  }
+  button {
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+  ::selection {
+    background: var(--color-wax);
+    color: var(--color-on-wax);
+  }
 }
 
-body {
-  margin: 0;
-  background: var(--color-night);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
-  -webkit-tap-highlight-color: transparent;
-  overscroll-behavior: none;
-  -webkit-font-smoothing: antialiased;
+@layer components {
+  /* small caps rubric, as in old academic editions */
+  .sc {
+    font-family: var(--font-sc);
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+    font-variant-numeric: lining-nums;
+  }
+  .num {
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rule-b {
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .rule-t {
+    border-top: 1px solid var(--color-rule);
+  }
+  .double-rule-t {
+    border-top: 3px double var(--color-rule-strong);
+  }
+  .double-rule-b {
+    border-bottom: 3px double var(--color-rule-strong);
+  }
+  .press {
+    transition: opacity 0.15s ease-out;
+  }
+  .press:active {
+    opacity: 0.6;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .safe-top {
+    padding-top: max(14px, env(safe-area-inset-top));
+  }
+  /* drop cap: three lines, gilt */
+  .dropcap::first-letter {
+    float: left;
+    font-family: var(--font-sc);
+    font-size: 3.6em;
+    line-height: 0.82;
+    padding: 0.06em 0.08em 0 0;
+    color: var(--color-gilt);
+  }
 }
 
-/* starry night behind every screen */
-.sky {
-  background:
-    radial-gradient(1200px 600px at 50% -10%, rgba(139, 124, 255, 0.16), transparent 60%),
-    radial-gradient(800px 400px at 100% 110%, rgba(244, 201, 93, 0.07), transparent 60%),
-    var(--color-night);
-}
-.sky::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.55), transparent 60%),
-    radial-gradient(1px 1px at 72% 9%, rgba(255, 255, 255, 0.45), transparent 60%),
-    radial-gradient(1.5px 1.5px at 38% 34%, rgba(244, 201, 93, 0.5), transparent 60%),
-    radial-gradient(1px 1px at 88% 41%, rgba(255, 255, 255, 0.35), transparent 60%),
-    radial-gradient(1px 1px at 22% 72%, rgba(255, 255, 255, 0.3), transparent 60%),
-    radial-gradient(1.5px 1.5px at 64% 63%, rgba(139, 124, 255, 0.55), transparent 60%),
-    radial-gradient(1px 1px at 52% 88%, rgba(255, 255, 255, 0.3), transparent 60%),
-    radial-gradient(1px 1px at 92% 82%, rgba(255, 255, 255, 0.35), transparent 60%);
-  z-index: 0;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
-button {
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
-}
-input,
-textarea,
-select {
-  font: inherit;
-  color: inherit;
-}
+@keyframes nova-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
-.no-scrollbar {
-  scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.press {
-  transition: transform 0.08s ease-out, opacity 0.15s;
-}
-.press:active {
-  transform: scale(0.97);
-}
-
-.gold-text {
-  background: linear-gradient(180deg, #fff1c9 0%, var(--color-gold) 55%, var(--color-gold-deep) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.parchment {
-  background-color: #e4d2a6;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.35), transparent 50%),
-    linear-gradient(160deg, #efe0bb, #dcc595);
-}
-
-.skeleton {
-  background: linear-gradient(90deg, var(--color-surface) 0%, var(--color-surface-2) 50%, var(--color-surface) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s ease-in-out infinite;
-}
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.safe-top {
-  padding-top: max(12px, env(safe-area-inset-top));
+/* the map is always paper and ink, in both themes */
+.map-surface {
+  --map-ink: #2A2117;
+  --map-paper: #EFE6D2;
+  background: #E7DCC4;
 }

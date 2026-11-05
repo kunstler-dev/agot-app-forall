@@ -36,14 +36,34 @@ def test_settings_default_to_demo():
     assert s.content_dir.name == "content" and s.tenant_file.name == "tenant.json"
 
 
-def test_crest_charges_are_known_to_the_renderer(settings):
-    """Every charge used by the content must exist in frontend/src/lib/heraldry.ts."""
-    import re
-    from pathlib import Path
-    ts = Path(__file__).resolve().parents[2] / "frontend" / "src" / "lib" / "heraldry.ts"
-    if not ts.exists():
-        pytest.skip("frontend sources not present")
-    known = set(re.findall(r"^  ([a-z_]+): `", ts.read_text(encoding="utf-8"), re.M))
+def test_every_charge_exists_and_tincture_rule(settings):
     c = Content.load(settings.content_dir)
-    used = {h.crest.charge for h in c.houses.values() if h.crest.charge}
-    assert used <= known, f"unknown charges: {sorted(used - known)}"
+    for h in c.houses.values():
+        for ch in h.crest.charges:
+            assert ch.charge in c.charges, f"{h.id}: {ch.charge}"
+        assert not h.crest.tincture_problems() or h.crest.canon_exception, f"{h.id}: {h.crest.tincture_problems()}"
+
+
+def test_tincture_rule_detects_clashes():
+    from app.content.schema import Crest
+    bad = Crest.model_validate({"field": {"tinctures": ["or"]}, "charges": [{"charge": "mullet", "tincture": "argent"}]})
+    assert bad.tincture_problems() == ["mullet argent on or"]
+    ok = Crest.model_validate({"field": {"tinctures": ["gules"]}, "charges": [{"charge": "mullet", "tincture": "or"}]})
+    assert ok.tincture_problems() == []
+    divided = Crest.model_validate({"field": {"division": "per_pale", "tinctures": ["or", "gules"]},
+                                    "charges": [{"charge": "mullet", "tincture": "argent"}]})
+    assert divided.tincture_problems() == []
+
+
+async def test_heraldry_endpoint(client):
+    lib = (await client.get("/api/heraldry")).json()
+    assert "lion_rampant" in lib and "svg" in lib["lion_rampant"]
+
+
+async def test_prerendered_crest_is_served(client, app):
+    hid = sorted(app.state.content.houses)[0]
+    r = await client.get(f"/api/heraldry/house/{hid}.svg")
+    assert r.status_code in (200, 404)
+    if r.status_code == 200:
+        assert r.headers["content-type"].startswith("image/svg")
+    assert (await client.get("/api/heraldry/house/nope.svg")).status_code == 404

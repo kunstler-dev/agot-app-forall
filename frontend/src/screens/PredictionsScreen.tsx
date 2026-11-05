@@ -1,75 +1,70 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { motion } from 'framer-motion'
 import { useState } from 'react'
 
 import { Avatar } from '../components/Avatar'
-import { Crest } from '../components/Crest'
-import { Icon } from '../components/icons'
-import { Card, Empty, Header, Pill, Segmented, Skeleton } from '../components/ui'
+import { Empty, Radio, Rubric, ShareLine, Skeleton, Tabs, Title } from '../components/ui'
+import { Crest } from '../heraldry'
+import { Icon } from '../icons'
 import { api, errorText, type PEvent, type Top, type TopRow } from '../lib/api'
 import { haptic, hapticResult } from '../lib/telegram'
-import { useNow } from '../lib/useNow'
 import { t, timeLeft } from '../lib/texts'
-import { houseById, useApp } from '../store/app'
 import { useToast } from '../lib/toast'
+import { useNow } from '../lib/useNow'
+import { houseById, useApp } from '../store/app'
+import { roman } from '../lib/format'
 
-function EventCard({ e, onVote }: { e: PEvent; onVote: (id: number, opt: number) => Promise<void> }) {
+const date = (ms: number) => new Date(ms).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+
+/** One event as an entry in a chronicle: date and tag in the margin, the question as a heading. */
+function Entry({ e, onVote }: { e: PEvent; onVote: (id: number, opt: number) => Promise<void> }) {
   const [busy, setBusy] = useState(false)
   const now = useNow()
-  const left = e.deadline_ms - now
   const resolved = e.status === 'resolved'
   return (
-    <Card className="flex flex-col gap-3 p-4">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex flex-wrap gap-1.5">
-          {e.tag && <Pill>{e.tag}</Pill>}
-          {resolved ? <Pill className="text-hit">итог</Pill> : e.open ? <Pill className="text-gold"><Icon name="bell" size={12} /> {timeLeft(left)}</Pill> : <Pill className="text-muted"><Icon name="lock" size={12} /> ждём итога</Pill>}
-        </div>
-        <span className="text-[11px] text-dim">{e.votes} голос.</span>
+    <article className="rule-b grid grid-cols-[3.4rem_1fr] gap-x-3 py-4">
+      <div className="flex flex-col gap-1 pt-1 text-xs text-ink-muted">
+        <span className="num">{date(e.deadline_ms)}</span>
+        {e.tag && <span className="sc leading-tight">{e.tag}</span>}
       </div>
-      <div className="font-display text-[21px] leading-snug font-bold">{e.question}</div>
-      <div className="flex flex-col gap-2">
-        {e.options.map((o, i) => {
-          const d = e.distribution?.[i]
-          const mine = e.my_vote === i
-          const correct = resolved && e.correct === i
-          return (
-            <button
-              key={i}
-              type="button"
-              disabled={!e.open || busy}
-              onClick={async () => {
-                setBusy(true)
-                await onVote(e.id, i)
-                setBusy(false)
-              }}
-              className={`press relative overflow-hidden rounded-xl border px-3.5 py-3 text-left text-[14px] font-semibold disabled:active:scale-100 ${
-                correct ? 'border-hit bg-hit/10' : mine ? 'border-gold bg-gold/10' : 'border-line-2 bg-surface-2'
-              }`}
-            >
-              {d && <motion.span className={`absolute inset-y-0 left-0 ${correct ? 'bg-hit/20' : 'bg-nova/15'}`} initial={{ width: 0 }} animate={{ width: `${d.share * 100}%` }} transition={{ duration: 0.6 }} />}
-              <span className="relative flex items-center justify-between gap-2">
-                <span className="flex items-center gap-2">
-                  {mine && <Icon name="check" size={16} className="text-gold" />}
-                  {o}
-                </span>
-                {d && <span className="text-[13px] font-bold text-muted">{Math.round(d.share * 100)}%</span>}
-              </span>
-            </button>
-          )
-        })}
+      <div className="flex flex-col gap-3">
+        <h2 className="m-0 text-lg leading-snug font-normal">{e.question}</h2>
+        <div className="flex items-center gap-1.5 text-sm text-ink-muted">
+          <Icon name={e.open ? 'hourglass' : 'lock'} size={16} />
+          {resolved ? 'итог подведён' : e.open ? `до закрытия ${timeLeft(e.deadline_ms - now)}` : 'приём закрыт, ждём итога'}
+          <span className="num ml-auto">{e.votes} голос.</span>
+        </div>
+        <ul className="m-0 flex list-none flex-col gap-2 p-0">
+          {e.options.map((o, i) => {
+            const d = e.distribution?.[i]
+            const mine = e.my_vote === i
+            const correct = resolved && e.correct === i
+            return (
+              <li key={i}>
+                <button type="button" disabled={!e.open || busy} onClick={async () => { setBusy(true); await onVote(e.id, i); setBusy(false) }}
+                  className="press flex w-full flex-col gap-1 text-left disabled:active:opacity-100">
+                  <span className="flex w-full items-start gap-2.5">
+                    <span className="mt-1"><Radio on={mine} /></span>
+                    <span className={`flex-1 ${correct ? 'text-verdigris' : ''}`}>{o}{correct ? ' ✓' : ''}</span>
+                    {d && <span className="num text-sm text-ink-muted">{Math.round(d.share * 100)}%</span>}
+                  </span>
+                  {d && <span className="pl-7"><ShareLine value={d.share} strong={correct} /></span>}
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+        {resolved && e.my_vote !== null && (
+          <p className={`m-0 text-sm italic ${e.my_points ? 'text-verdigris' : 'text-ink-muted'}`}>
+            {e.my_points ? `Угадано: +${e.my_points} очков${e.my_points > e.base_points ? ', редкий исход' : ''}.` : 'Мимо.'}
+          </p>
+        )}
+        {e.open && (
+          <p className="m-0 text-sm text-ink-muted">
+            {e.my_vote === null ? 'До срока можно передумать.' : 'Прогноз принят. Расклад голосов откроется после срока.'}
+          </p>
+        )}
       </div>
-      {resolved && e.my_vote !== null && (
-        <div className={`text-[13px] font-bold ${e.my_points ? 'text-hit' : 'text-muted'}`}>
-          {e.my_points ? `Верно! +${e.my_points} очков${e.my_points > e.base_points ? ' — смелый прогноз' : ''}` : 'В этот раз мимо'}
-        </div>
-      )}
-      {e.open && (
-        <div className="text-[12px] text-dim">
-          {e.my_vote === null ? 'Выбери вариант — до дедлайна можно передумать.' : 'Голос принят. Распределение откроется после дедлайна.'} Угадал вариант, который выбрали меньше {Math.round(e.bold_threshold * 100)}% — очки ×{e.bold_multiplier}.
-        </div>
-      )}
-    </Card>
+    </article>
   )
 }
 
@@ -77,39 +72,36 @@ function Row({ r }: { r: TopRow }) {
   const cfg = useApp((s) => s.config)
   const h = houseById(cfg, r.house)
   return (
-    <div className={`flex items-center gap-3 rounded-xl px-3 py-2.5 ${r.me ? 'border border-gold/40 bg-gold/10' : ''}`}>
-      <span className={`w-7 text-center text-[16px] font-extrabold ${r.rank <= 3 ? 'text-gold' : 'text-dim'}`}>{r.rank}</span>
-      <Avatar name={r.name} url={r.photo_url} size={34} />
-      <div className="min-w-0 flex-1">
-        <div className="truncate text-[14px] font-bold">{r.name}{r.me ? ' (вы)' : ''}</div>
-        {h && <div className="truncate text-[11px] text-dim">{h.name}</div>}
-      </div>
-      {h && <Crest spec={h.crest} size={20} />}
-      <span className="w-14 text-right text-[14px] font-extrabold text-gold">{r.points}</span>
-    </div>
+    <tr className="rule-b">
+      <td className={`num w-9 py-2 ${r.rank <= 3 ? 'sc text-gilt' : 'text-ink-muted'}`}>{r.rank <= 3 ? roman(r.rank) : r.rank}</td>
+      <td className="py-2">
+        <span className="flex items-center gap-2.5">
+          <Avatar name={r.name} url={r.photo_url} size={28} />
+          <span className="min-w-0 flex-1 truncate">{r.name}{r.me ? ', вы' : ''}</span>
+          {h && <Crest blazon={h.crest} size={16} engraved />}
+        </span>
+      </td>
+      <td className="num w-14 py-2 text-right">{r.points}</td>
+    </tr>
   )
 }
 
 export function Leaderboard({ data, emptyText }: { data: Top | undefined; emptyText: string }) {
-  if (!data) return <Skeleton className="h-60" />
+  if (!data) return <Skeleton lines={6} />
   const meInTop = data.top.some((r) => r.me)
   return (
-    <Card className="p-1.5">
-      {data.top.length === 0 ? (
-        <Empty icon="crown" title="Пока пусто" text={emptyText} />
-      ) : (
-        <div className="flex flex-col">{data.top.map((r) => <Row key={r.id} r={r} />)}</div>
+    <div>
+      {data.top.length === 0 ? <Empty text={emptyText} /> : (
+        <table className="w-full border-collapse"><tbody>{data.top.map((r) => <Row key={r.id} r={r} />)}</tbody></table>
       )}
       {!meInTop && (
-        <div className="sticky bottom-0 mt-1 border-t border-line bg-surface pt-1.5">
-          <div className="flex items-center gap-3 rounded-xl border border-gold/40 bg-gold/10 px-3 py-2.5">
-            <span className="w-7 text-center text-[16px] font-extrabold text-dim">{data.me.rank ?? '—'}</span>
-            <span className="flex-1 text-[14px] font-bold">Ваше место</span>
-            <span className="text-[14px] font-extrabold text-gold">{data.me.points}</span>
-          </div>
+        <div className="double-rule-t sticky bottom-0 mt-2 flex items-baseline bg-paper py-2">
+          <span className="num w-9 text-ink-muted">{data.me.rank ?? '—'}</span>
+          <span className="flex-1 italic">Ваше место</span>
+          <span className="num">{data.me.points}</span>
         </div>
       )}
-    </Card>
+    </div>
   )
 }
 
@@ -140,26 +132,22 @@ export function PredictionsScreen() {
   const open = list.filter((e) => e.open)
   const closed = list.filter((e) => !e.open)
   return (
-    <div className="flex flex-col gap-4 px-4 pt-5 pb-8 safe-top">
-      <Header title={t('predictions.title')} subtitle={t('predictions.subtitle')} />
-      <Segmented value={view} onChange={setView} options={[['events', 'События'], ['top', 'Рейтинг']]} />
+    <div className="flex flex-col gap-4 px-5 pt-4 pb-10 safe-top">
+      <Title sub={t('predictions.subtitle')}>{t('predictions.title')}</Title>
+      <Tabs value={view} onChange={setView} options={[['events', 'Хроника'], ['top', 'Рейтинг']]} />
       {view === 'events' ? (
-        !events.data ? (
-          <div className="flex flex-col gap-3"><Skeleton className="h-48" /><Skeleton className="h-48" /></div>
-        ) : list.length === 0 ? (
-          <Empty icon="scroll" title="Событий пока нет" text="Автор канала скоро добавит прогнозы на новые серии." />
-        ) : (
-          <div className="flex flex-col gap-3">
-            {open.map((e) => <EventCard key={e.id} e={e} onVote={vote} />)}
-            {closed.length > 0 && <div className="mt-2 text-[12px] font-bold tracking-[0.18em] text-dim uppercase">Завершённые</div>}
-            {closed.map((e) => <EventCard key={e.id} e={e} onVote={vote} />)}
+        !events.data ? <Skeleton lines={7} /> : list.length === 0 ? <Empty text="Записей пока нет. Автор добавит прогнозы к новым сериям." /> : (
+          <div>
+            {open.map((e) => <Entry key={e.id} e={e} onVote={vote} />)}
+            {closed.length > 0 && <div className="mt-4"><Rubric>Закрытые</Rubric></div>}
+            {closed.map((e) => <Entry key={e.id} e={e} onVote={vote} />)}
           </div>
         )
       ) : (
         <div className="flex flex-col gap-3">
-          <Segmented small value={period} onChange={setPeriod} options={[['week', 'Неделя'], ['season', events.data?.season_label ?? 'Сезон'], ['all', 'Всё время']]} />
-          <Segmented small value={scope} onChange={setScope} options={[['predictions', 'Прогнозы'], ['all', 'Все очки']]} />
-          <Leaderboard data={top.data} emptyText="Очки появятся, когда автор подведёт итоги первых событий." />
+          <Tabs value={period} onChange={setPeriod} options={[['week', 'Неделя'], ['season', events.data?.season_label ?? 'Сезон'], ['all', 'Всё время']]} />
+          <Tabs value={scope} onChange={setScope} options={[['predictions', 'Прогнозы'], ['all', 'Все очки']]} />
+          <Leaderboard data={top.data} emptyText="Очков пока нет. Они появятся, когда автор подведёт итоги." />
         </div>
       )}
     </div>
