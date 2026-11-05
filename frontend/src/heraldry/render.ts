@@ -164,7 +164,10 @@ function placeCharges(arr: string, count: number, hasChief: boolean): { x: numbe
   const cy = hasChief ? 72 : 56
   if (count <= 1 || arr === 'single') return [{ x: 50, y: cy, s: hasChief ? 58 : 72 }]
   if (arr === 'in_pale') return Array.from({ length: count }, (_, i) => ({ x: 50, y: top + 16 + (i * (94 - top)) / count, s: 76 / count }))
-  if (arr === 'in_fess' || count === 2) return Array.from({ length: count }, (_, i) => ({ x: 18 + (64 / (count - 1)) * i, y: cy, s: 90 / count }))
+  if (arr === 'in_fess' || count === 2) {
+    const span = count === 2 ? 40 : 60
+    return Array.from({ length: count }, (_, i) => ({ x: 50 - span / 2 + (span / (count - 1)) * i, y: cy, s: Math.min(44, 92 / count) }))
+  }
   if (arr === 'semy') {
     const pts: { x: number; y: number; s: number }[] = []
     for (let y = top + 12; y < 100; y += 22) for (let x = (y / 22) % 2 ? 22 : 34; x < 90; x += 24) pts.push({ x, y, s: 16 })
