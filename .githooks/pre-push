@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Blocks pushes that contain stop-list words or secrets. Enable once per clone:
+#   git config core.hooksPath .githooks
+exec "$(git rev-parse --show-toplevel)/scripts/check_public.sh"
