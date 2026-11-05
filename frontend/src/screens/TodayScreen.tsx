@@ -212,7 +212,7 @@ function CharacterGame({ daily, onUpdate }: { daily: Daily; onUpdate: (d: Daily)
   return (
     <div className="flex flex-col gap-4">
       {!data.finished && (
-        <Card className="flex flex-col gap-3 p-4">
+        <Card className="relative z-30 flex flex-col gap-3 p-4">
           <div className="flex items-center justify-between text-[12px] font-bold text-muted">
             <span>Попытка {used + 1} из {data.max_attempts}</span>
             <span>{data.max_attempts - used} {plural(data.max_attempts - used, 'осталась', 'осталось', 'осталось')}</span>
@@ -333,7 +333,7 @@ function CrestGame({ daily, onUpdate }: { daily: Daily; onUpdate: (d: Daily) => 
         )}
       </Card>
       {!data.finished && (
-        <Card className="flex flex-col gap-3 p-4">
+        <Card className="relative z-30 flex flex-col gap-3 p-4">
           <Attempts used={used} max={data.max_attempts} />
           <Autocomplete items={items} exclude={exclude} placeholder={t('daily.crest.input')} onPick={guess} disabled={busy} />
         </Card>
