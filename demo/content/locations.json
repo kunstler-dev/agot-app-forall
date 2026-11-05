@@ -1,0 +1,305 @@
+{
+ "map": {
+  "file": "map.svg",
+  "width": 1000,
+  "height": 1400,
+  "title": "Северные Марки"
+ },
+ "locations": [
+  {
+   "id": "halgrim-hold",
+   "name": "Хальгрим-холд",
+   "x": 330,
+   "y": 270,
+   "kind": "castle",
+   "rank": 1,
+   "region": "Ледяной Предел",
+   "spoiler": 1,
+   "houses": [
+    "halgrim"
+   ],
+   "characters": [
+    "ingvar",
+    "sigrun"
+   ],
+   "description": "Крепость из чёрного камня у подножия Ледяных гор. Здесь никогда не гаснут очаги."
+  },
+  {
+   "id": "ice-gates",
+   "name": "Ледяные Врата",
+   "x": 560,
+   "y": 245,
+   "kind": "landmark",
+   "rank": 2,
+   "region": "Ледяной Предел",
+   "spoiler": 1,
+   "houses": [
+    "halgrim"
+   ],
+   "characters": [
+    "torvald"
+   ],
+   "description": "Единственный перевал через Ледяные горы, перегороженный древней стеной."
+  },
+  {
+   "id": "olvenhall",
+   "name": "Ольвенхолл",
+   "x": 270,
+   "y": 480,
+   "kind": "castle",
+   "rank": 1,
+   "region": "Сумрачный лес",
+   "spoiler": 1,
+   "houses": [
+    "olven"
+   ],
+   "characters": [
+    "elowen"
+   ],
+   "description": "Замок, выросший из корней исполинских деревьев. Его трудно найти даже с картой."
+  },
+  {
+   "id": "brandtstein",
+   "name": "Брандтштайн",
+   "x": 640,
+   "y": 520,
+   "kind": "castle",
+   "rank": 1,
+   "region": "Каменные холмы",
+   "spoiler": 1,
+   "houses": [
+    "brandt"
+   ],
+   "characters": [
+    "gerold"
+   ],
+   "description": "Город-крепость, вырубленный в скале. Его стены не брал ни один таран."
+  },
+  {
+   "id": "mirein-ford",
+   "name": "Мирейн-на-Броде",
+   "x": 470,
+   "y": 700,
+   "kind": "city",
+   "rank": 1,
+   "region": "Речной край",
+   "spoiler": 1,
+   "houses": [
+    "mirein"
+   ],
+   "characters": [
+    "aldric",
+    "maren"
+   ],
+   "description": "Шумный торговый город у единственного брода через Серебрянку."
+  },
+  {
+   "id": "korvel-cape",
+   "name": "Корвель-на-Мысе",
+   "x": 835,
+   "y": 305,
+   "kind": "castle",
+   "rank": 1,
+   "region": "Вороний мыс",
+   "spoiler": 1,
+   "houses": [
+    "korvel"
+   ],
+   "characters": [
+    "osric",
+    "vesna"
+   ],
+   "description": "Башня летописцев на краю скалы, где ветер не стихает ни днём, ни ночью."
+  },
+  {
+   "id": "talmaris",
+   "name": "Тальмарис",
+   "x": 560,
+   "y": 1110,
+   "kind": "city",
+   "rank": 1,
+   "region": "Солнечный берег",
+   "spoiler": 1,
+   "houses": [
+    "talmar"
+   ],
+   "characters": [
+    "cassian",
+    "liora"
+   ],
+   "description": "Белый город на южном берегу, полный фонтанов, виноградников и интриг."
+  },
+  {
+   "id": "eskart-port",
+   "name": "Эскарт-порт",
+   "x": 175,
+   "y": 1175,
+   "kind": "city",
+   "rank": 1,
+   "region": "Солёные острова",
+   "spoiler": 1,
+   "houses": [
+    "eskart"
+   ],
+   "characters": [
+    "brann"
+   ],
+   "description": "Гавань на сваях, где корабли привязывают прямо к окнам таверн."
+  },
+  {
+   "id": "roven-post",
+   "name": "Ровенская застава",
+   "x": 760,
+   "y": 890,
+   "kind": "castle",
+   "rank": 1,
+   "region": "Пограничье",
+   "spoiler": 1,
+   "houses": [
+    "roven"
+   ],
+   "characters": [
+    "kael"
+   ],
+   "description": "Деревянная крепость, ставшая за одно поколение каменной."
+  },
+  {
+   "id": "grey-haven",
+   "name": "Серая Гавань",
+   "x": 320,
+   "y": 810,
+   "kind": "city",
+   "rank": 2,
+   "region": "Речной край",
+   "spoiler": 1,
+   "houses": [
+    "mirein"
+   ],
+   "description": "Портовый город в глубине залива, вечно окутанный туманом."
+  },
+  {
+   "id": "ash-abbey",
+   "name": "Пепельный монастырь",
+   "x": 655,
+   "y": 385,
+   "kind": "ruin",
+   "rank": 2,
+   "region": "Каменные холмы",
+   "spoiler": 2,
+   "characters": [
+    "brother-tam"
+   ],
+   "description": "Монастырь, сгоревший в первую зиму войны. Монахи вернулись на пепелище."
+  },
+  {
+   "id": "kings-barrow",
+   "name": "Курган Старых Королей",
+   "x": 455,
+   "y": 950,
+   "kind": "ruin",
+   "rank": 2,
+   "region": "Пограничье",
+   "spoiler": 2,
+   "description": "Холм с древними гробницами. Говорят, под ним спит первый король Марок."
+  },
+  {
+   "id": "last-light",
+   "name": "Маяк Последнего Света",
+   "x": 305,
+   "y": 1290,
+   "kind": "landmark",
+   "rank": 2,
+   "region": "Солёные острова",
+   "spoiler": 2,
+   "houses": [
+    "eskart"
+   ],
+   "characters": [
+    "nerys"
+   ],
+   "description": "Маяк на крошечном острове. Его огонь видно из Тальмариса."
+  },
+  {
+   "id": "mirror-lake",
+   "name": "Зеркальное озеро",
+   "x": 600,
+   "y": 790,
+   "kind": "landmark",
+   "rank": 2,
+   "region": "Речной край",
+   "spoiler": 1,
+   "description": "Озеро настолько тихое, что в нём отражаются звёзды даже днём."
+  },
+  {
+   "id": "winds-pass",
+   "name": "Перевал Ветров",
+   "x": 745,
+   "y": 640,
+   "kind": "landmark",
+   "rank": 3,
+   "region": "Каменные холмы",
+   "spoiler": 3,
+   "characters": [
+    "ysolde"
+   ],
+   "description": "Узкий проход, где в Главе III решилась судьба юга."
+  }
+ ],
+ "paths": [
+  {
+   "character": "sigrun",
+   "stops": [
+    {
+     "location": "halgrim-hold"
+    },
+    {
+     "location": "ice-gates"
+    },
+    {
+     "location": "brandtstein",
+     "spoiler": 2
+    },
+    {
+     "location": "winds-pass",
+     "spoiler": 3,
+     "note": "Битва на перевале"
+    }
+   ]
+  },
+  {
+   "character": "liora",
+   "stops": [
+    {
+     "location": "talmaris"
+    },
+    {
+     "location": "last-light",
+     "spoiler": 2
+    },
+    {
+     "location": "eskart-port",
+     "spoiler": 2
+    },
+    {
+     "location": "roven-post",
+     "spoiler": 3
+    }
+   ]
+  },
+  {
+   "character": "aldric",
+   "stops": [
+    {
+     "location": "mirein-ford"
+    },
+    {
+     "location": "grey-haven"
+    },
+    {
+     "location": "olvenhall",
+     "spoiler": 2
+    }
+   ]
+  }
+ ]
+}

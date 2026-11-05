@@ -1,0 +1,530 @@
+{
+ "attributes": [
+  {
+   "key": "house",
+   "label": "Дом",
+   "type": "category",
+   "ref": "house",
+   "partial_via": "allegiance",
+   "values": {
+    "none": "Без дома"
+   }
+  },
+  {
+   "key": "region",
+   "label": "Регион",
+   "type": "category",
+   "values": {
+    "north": "Ледяной Предел",
+    "dusk": "Сумрачный лес",
+    "hills": "Каменные холмы",
+    "river": "Речной край",
+    "cape": "Вороний мыс",
+    "sun": "Солнечный берег",
+    "isles": "Солёные острова",
+    "border": "Пограничье"
+   }
+  },
+  {
+   "key": "gender",
+   "label": "Пол",
+   "type": "category",
+   "values": {
+    "m": "Мужской",
+    "f": "Женский"
+   }
+  },
+  {
+   "key": "status",
+   "label": "Статус",
+   "type": "category",
+   "values": {
+    "alive": "Жив",
+    "dead": "Мёртв",
+    "unknown": "Неизвестно"
+   }
+  },
+  {
+   "key": "first",
+   "label": "Появление",
+   "type": "ordinal",
+   "values": {
+    "1": "Глава I",
+    "2": "Глава II",
+    "3": "Глава III"
+   }
+  },
+  {
+   "key": "roles",
+   "label": "Роль",
+   "type": "set",
+   "values": {
+    "lord": "Лорд",
+    "heir": "Наследник",
+    "warrior": "Воин",
+    "scholar": "Учёный",
+    "sailor": "Мореход",
+    "spy": "Лазутчик",
+    "healer": "Целитель",
+    "rebel": "Мятежник",
+    "priest": "Жрец",
+    "trader": "Торговец"
+   }
+  },
+  {
+   "key": "allegiance",
+   "label": "Союз",
+   "type": "set",
+   "ref": "house"
+  }
+ ],
+ "crest_attr": "house",
+ "characters": [
+  {
+   "id": "ingvar",
+   "name": "Ингвар Хальгрим",
+   "aliases": [],
+   "attrs": {
+    "house": "halgrim",
+    "region": "north",
+    "gender": "m",
+    "status": "alive",
+    "first": 1,
+    "roles": [
+     "lord",
+     "warrior"
+    ],
+    "allegiance": [
+     "halgrim",
+     "olven",
+     "korvel"
+    ]
+   },
+   "quote": "Зима не спрашивает разрешения войти.",
+   "bio": "Лорд Ледяного Предела, суровый, но справедливый."
+  },
+  {
+   "id": "sigrun",
+   "name": "Сигрун Хальгрим",
+   "aliases": [],
+   "attrs": {
+    "house": "halgrim",
+    "region": "north",
+    "gender": "f",
+    "status": "alive",
+    "first": 1,
+    "roles": [
+     "heir",
+     "warrior"
+    ],
+    "allegiance": [
+     "halgrim",
+     "olven",
+     "korvel"
+    ]
+   },
+   "quote": "Мой меч тяжелее твоих обещаний.",
+   "bio": "Старшая дочь Ингвара, лучший лучник Предела."
+  },
+  {
+   "id": "torvald",
+   "name": "Торвальд Хальгрим",
+   "aliases": [],
+   "attrs": {
+    "house": "halgrim",
+    "region": "north",
+    "gender": "m",
+    "status": "dead",
+    "first": 1,
+    "roles": [
+     "warrior"
+    ],
+    "allegiance": [
+     "halgrim",
+     "olven",
+     "korvel"
+    ]
+   },
+   "quote": "Держите перевал до рассвета.",
+   "bio": "Младший брат лорда, павший у Ледяных Врат."
+  },
+  {
+   "id": "elowen",
+   "name": "Элоуэн Ольвен",
+   "aliases": [],
+   "attrs": {
+    "house": "olven",
+    "region": "dusk",
+    "gender": "f",
+    "status": "alive",
+    "first": 1,
+    "roles": [
+     "lord",
+     "scholar"
+    ],
+    "allegiance": [
+     "halgrim",
+     "olven",
+     "korvel"
+    ]
+   },
+   "quote": "Тот, кто слушает лес, никогда не заблудится.",
+   "bio": "Леди Ольвенхолла, знаток трав и старых песен."
+  },
+  {
+   "id": "fenn",
+   "name": "Фенн Ольвен",
+   "aliases": [],
+   "attrs": {
+    "house": "olven",
+    "region": "dusk",
+    "gender": "m",
+    "status": "unknown",
+    "first": 2,
+    "roles": [
+     "spy"
+    ],
+    "allegiance": [
+     "halgrim",
+     "olven",
+     "korvel"
+    ]
+   },
+   "quote": "Тени — лучшие союзники.",
+   "bio": "Пропавший племянник леди Элоуэн."
+  },
+  {
+   "id": "gerold",
+   "name": "Герольд Брандт",
+   "aliases": [],
+   "attrs": {
+    "house": "brandt",
+    "region": "hills",
+    "gender": "m",
+    "status": "alive",
+    "first": 1,
+    "roles": [
+     "lord",
+     "trader"
+    ],
+    "allegiance": [
+     "mirein",
+     "brandt"
+    ]
+   },
+   "quote": "Каждый камень на своём месте.",
+   "bio": "Владыка Брандтштайна, богатейший из лордов Марок."
+  },
+  {
+   "id": "hilde",
+   "name": "Хильда Брандт",
+   "aliases": [],
+   "attrs": {
+    "house": "brandt",
+    "region": "hills",
+    "gender": "f",
+    "status": "dead",
+    "first": 2,
+    "roles": [
+     "healer"
+    ],
+    "allegiance": [
+     "mirein",
+     "brandt"
+    ]
+   },
+   "quote": "Я лечу и своих, и чужих.",
+   "bio": "Целительница, погибшая во время осады."
+  },
+  {
+   "id": "aldric",
+   "name": "Алдрик Мирейн",
+   "aliases": [],
+   "attrs": {
+    "house": "mirein",
+    "region": "river",
+    "gender": "m",
+    "status": "alive",
+    "first": 1,
+    "roles": [
+     "lord"
+    ],
+    "allegiance": [
+     "mirein",
+     "brandt"
+    ]
+   },
+   "quote": "Лучший мост — тот, что строят вдвоём.",
+   "bio": "Лорд Речного края, мастер переговоров."
+  },
+  {
+   "id": "maren",
+   "name": "Марен Мирейн",
+   "aliases": [],
+   "attrs": {
+    "house": "mirein",
+    "region": "river",
+    "gender": "f",
+    "status": "alive",
+    "first": 2,
+    "roles": [
+     "heir",
+     "trader"
+    ],
+    "allegiance": [
+     "mirein",
+     "brandt"
+    ]
+   },
+   "quote": "Монета течёт, как вода.",
+   "bio": "Наследница Мирейнов, держит ярмарки у Брода."
+  },
+  {
+   "id": "osric",
+   "name": "Осрик Корвель",
+   "aliases": [],
+   "attrs": {
+    "house": "korvel",
+    "region": "cape",
+    "gender": "m",
+    "status": "alive",
+    "first": 1,
+    "roles": [
+     "lord",
+     "scholar"
+    ],
+    "allegiance": [
+     "halgrim",
+     "olven",
+     "korvel"
+    ]
+   },
+   "quote": "Запиши, иначе этого не было.",
+   "bio": "Хранитель Свода Марок."
+  },
+  {
+   "id": "vesna",
+   "name": "Весна Корвель",
+   "aliases": [],
+   "attrs": {
+    "house": "korvel",
+    "region": "cape",
+    "gender": "f",
+    "status": "alive",
+    "first": 3,
+    "roles": [
+     "scholar",
+     "spy"
+    ],
+    "allegiance": [
+     "halgrim",
+     "olven",
+     "korvel"
+    ]
+   },
+   "quote": "Я читаю письма до того, как их напишут.",
+   "bio": "Младшая сестра Осрика, мастер шифров."
+  },
+  {
+   "id": "cassian",
+   "name": "Кассиан Тальмар",
+   "aliases": [],
+   "attrs": {
+    "house": "talmar",
+    "region": "sun",
+    "gender": "m",
+    "status": "dead",
+    "first": 1,
+    "roles": [
+     "lord",
+     "warrior"
+    ],
+    "allegiance": [
+     "talmar",
+     "eskart",
+     "roven"
+    ]
+   },
+   "quote": "Свет не прячется.",
+   "bio": "Князь Тальмариса, погибший в Пожаре на юге."
+  },
+  {
+   "id": "liora",
+   "name": "Лиора Тальмар",
+   "aliases": [],
+   "attrs": {
+    "house": "talmar",
+    "region": "sun",
+    "gender": "f",
+    "status": "alive",
+    "first": 2,
+    "roles": [
+     "heir",
+     "rebel"
+    ],
+    "allegiance": [
+     "talmar",
+     "eskart",
+     "roven"
+    ]
+   },
+   "quote": "Если трон горит — пусть горит ярче.",
+   "bio": "Дочь Кассиана, поднявшая юг."
+  },
+  {
+   "id": "dario",
+   "name": "Дарио Тальмар",
+   "aliases": [],
+   "attrs": {
+    "house": "talmar",
+    "region": "sun",
+    "gender": "m",
+    "status": "alive",
+    "first": 3,
+    "roles": [
+     "sailor",
+     "warrior"
+    ],
+    "allegiance": [
+     "talmar",
+     "eskart",
+     "roven"
+    ]
+   },
+   "quote": "Песня и клинок — одно и то же.",
+   "bio": "Бастард-поэт, капитан южной флотилии."
+  },
+  {
+   "id": "brann",
+   "name": "Бранн Эскарт",
+   "aliases": [],
+   "attrs": {
+    "house": "eskart",
+    "region": "isles",
+    "gender": "m",
+    "status": "alive",
+    "first": 1,
+    "roles": [
+     "lord",
+     "sailor"
+    ],
+    "allegiance": [
+     "talmar",
+     "eskart",
+     "roven"
+    ]
+   },
+   "quote": "Море даст ответ.",
+   "bio": "Адмирал Солёных островов."
+  },
+  {
+   "id": "nerys",
+   "name": "Нерис Эскарт",
+   "aliases": [],
+   "attrs": {
+    "house": "eskart",
+    "region": "isles",
+    "gender": "f",
+    "status": "unknown",
+    "first": 2,
+    "roles": [
+     "sailor",
+     "trader"
+    ],
+    "allegiance": [
+     "talmar",
+     "eskart",
+     "roven"
+    ]
+   },
+   "quote": "Я знаю цену шторма.",
+   "bio": "Капитан-контрабандистка, исчезнувшая в тумане."
+  },
+  {
+   "id": "kael",
+   "name": "Каэль Ровен",
+   "aliases": [],
+   "attrs": {
+    "house": "roven",
+    "region": "border",
+    "gender": "m",
+    "status": "alive",
+    "first": 1,
+    "roles": [
+     "lord",
+     "spy"
+    ],
+    "allegiance": [
+     "talmar",
+     "eskart",
+     "roven"
+    ]
+   },
+   "quote": "Победа любит того, кто думает вперёд.",
+   "bio": "Основатель дома Ровен."
+  },
+  {
+   "id": "ysolde",
+   "name": "Изольда Ровен",
+   "aliases": [],
+   "attrs": {
+    "house": "roven",
+    "region": "border",
+    "gender": "f",
+    "status": "alive",
+    "first": 3,
+    "roles": [
+     "rebel",
+     "warrior"
+    ],
+    "allegiance": [
+     "talmar",
+     "eskart",
+     "roven"
+    ]
+   },
+   "quote": "Границы рисуют победители.",
+   "bio": "Капитан пограничной стражи."
+  },
+  {
+   "id": "brother-tam",
+   "name": "Брат Там",
+   "aliases": [],
+   "attrs": {
+    "house": "none",
+    "region": "hills",
+    "gender": "m",
+    "status": "alive",
+    "first": 1,
+    "roles": [
+     "priest",
+     "healer"
+    ],
+    "allegiance": []
+   },
+   "quote": "Пепел помнит всех.",
+   "bio": "Монах Пепельного монастыря, хранитель реликвий."
+  },
+  {
+   "id": "mira-crow",
+   "name": "Мира-Ворона",
+   "aliases": [],
+   "attrs": {
+    "house": "none",
+    "region": "cape",
+    "gender": "f",
+    "status": "unknown",
+    "first": 2,
+    "roles": [
+     "spy",
+     "rebel"
+    ],
+    "allegiance": [
+     "korvel"
+    ]
+   },
+   "quote": "Я лечу туда, куда не летают вороны.",
+   "bio": "Безродная вестница на службе Корвелей."
+  }
+ ]
+}

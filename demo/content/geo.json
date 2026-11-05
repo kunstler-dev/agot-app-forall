@@ -1,0 +1,77 @@
+[
+ {
+  "id": "c1",
+  "kind": "description",
+  "text": "Здесь очаги не гаснут, а стены сложены из чёрного камня у самых гор.",
+  "location": "halgrim-hold"
+ },
+ {
+  "id": "c2",
+  "kind": "climate",
+  "text": "Ветер здесь не стихает ни днём, ни ночью, а летописцы пишут, придерживая страницы камнями.",
+  "location": "korvel-cape"
+ },
+ {
+  "id": "c3",
+  "kind": "description",
+  "text": "Корабли привязывают прямо к окнам таверн.",
+  "location": "eskart-port"
+ },
+ {
+  "id": "c4",
+  "kind": "crest",
+  "text": "Над воротами — этот герб, а внизу шумит ярмарка у брода.",
+  "location": "mirein-ford",
+  "house": "mirein"
+ },
+ {
+  "id": "c5",
+  "kind": "quote",
+  "text": "«Свет не прячется», — сказал князь, глядя на фонтаны белого города.",
+  "location": "talmaris"
+ },
+ {
+  "id": "c6",
+  "kind": "description",
+  "text": "Озеро, в котором даже днём отражаются звёзды.",
+  "location": "mirror-lake"
+ },
+ {
+  "id": "c7",
+  "kind": "description",
+  "text": "Город-крепость, вырубленный в скале.",
+  "location": "brandtstein"
+ },
+ {
+  "id": "c8",
+  "kind": "climate",
+  "text": "Вечный туман, крики чаек и запах соли в глубине залива.",
+  "location": "grey-haven"
+ },
+ {
+  "id": "c9",
+  "kind": "crest",
+  "text": "Этот герб висит над деревянной крепостью, ставшей каменной за одно поколение.",
+  "location": "roven-post",
+  "house": "roven"
+ },
+ {
+  "id": "c10",
+  "kind": "description",
+  "text": "Замок среди корней исполинских деревьев.",
+  "location": "olvenhall"
+ },
+ {
+  "id": "c11",
+  "kind": "event",
+  "text": "Монахи вернулись сюда на пепелище.",
+  "location": "ash-abbey",
+  "spoiler": 2
+ },
+ {
+  "id": "c12",
+  "kind": "description",
+  "text": "Перевал, перегороженный древней стеной.",
+  "location": "ice-gates"
+ }
+]

@@ -1,0 +1,60 @@
+{
+ "id": "demo",
+ "app_name": "Цитадель",
+ "app_tagline": "Архив летописцев Северных Марок",
+ "welcome": "Добро пожаловать в Цитадель — архив, где проверяют знание лора. Каждый день новый персонаж, прогнозы на главы и карта мира.",
+ "channel": "",
+ "channel_url": "",
+ "channel_title": "Хроники Северных Марок",
+ "channel_about": "Демо-канал о вымышленном мире Северных Марок.",
+ "timezone": "Europe/Moscow",
+ "author_links": [
+  {
+   "label": "Stella Nova Labs",
+   "url": "https://github.com/stella-nova-labs"
+  }
+ ],
+ "theme": {
+  "accent": "#F4C95D",
+  "accent2": "#8B7CFF"
+ },
+ "texts": {},
+ "bot": {
+  "start_text": "Цитадель открыта: персонаж дня, прогнозы и карта Северных Марок.",
+  "button": "Открыть Цитадель",
+  "daily_text": "В Цитадели новый персонаж дня. Угадаешь с первой попытки?"
+ },
+ "spoiler_levels": [
+  {
+   "level": 1,
+   "label": "Глава I",
+   "hint": "Долгая зима"
+  },
+  {
+   "level": 2,
+   "label": "Глава II",
+   "hint": "Оттепель"
+  },
+  {
+   "level": 3,
+   "label": "Глава III",
+   "hint": "Пожар на юге"
+  }
+ ],
+ "daily": {
+  "seed": "northern-marches",
+  "epoch": "2026-01-01"
+ },
+ "predictions": {
+  "current_season": "ch4",
+  "season_label": "Глава IV"
+ },
+ "geo": {
+  "rounds": 5,
+  "max_score": 1000,
+  "scale": 110,
+  "perfect_radius": 14,
+  "daily_max_spoiler": 1
+ },
+ "disclaimer": "Северные Марки — оригинальный демо-мир Stella Nova Labs. Все персонажи и места вымышлены."
+}
