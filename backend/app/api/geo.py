@@ -6,7 +6,7 @@ from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -38,10 +38,13 @@ async def world_map(u: Player, s: Session, content: ContentDep, tenant: TenantDe
         if len(stops) >= 2 and p.character in content.characters:
             paths.append({"character": p.character, "name": content.characters[p.character].name,
                           "stops": [{"location": st.location, "note": st.note} for st in stops]})
+    layer = await house_layer(s, content, locs)
     await s.commit()
     return {
         "level": lv,
         "map": content.map.model_dump(),
+        "houses": layer,
+        "my_house": u.house,
         "locations": [{
             "id": x.id, "name": x.name, "x": x.x, "y": x.y, "kind": x.kind, "region": x.region, "rank": x.rank,
             "description": x.description,
@@ -50,6 +53,30 @@ async def world_map(u: Player, s: Session, content: ContentDep, tenant: TenantDe
         } for x in locs],
         "paths": sorted(paths, key=lambda p: p["name"]),
     }
+
+
+def seat_of(content: Content, house_id: str, locs) -> object | None:
+    """The location that stands for a house on the map: its seat if listed, else the first place linked to it."""
+    h = content.houses[house_id]
+    linked = [x for x in locs if house_id in x.houses]
+    return next((x for x in linked if x.name == h.seat), linked[0] if linked else None)
+
+
+async def house_layer(s: AsyncSession, content: Content, locs) -> dict:
+    """How many players belong to each house (by the quiz), placed at the house seat."""
+    counts = {h: int(n) for h, n in (await s.execute(
+        select(User.house, func.count()).where(User.house.is_not(None)).group_by(User.house))).all()}
+    total = sum(counts.values())
+    items = []
+    for hid, h in content.houses.items():
+        loc = seat_of(content, hid, locs)
+        if loc is None:
+            continue
+        n = counts.get(hid, 0)
+        items.append({"house": hid, "name": h.name, "words": h.words, "location": loc.id, "x": loc.x, "y": loc.y,
+                      "count": n, "pct": round(100 * n / total, 1) if total else 0.0, "crest": h.crest.model_dump()})
+    items.sort(key=lambda r: (-r["count"], r["name"]))
+    return {"total": total, "items": items}
 
 
 def clue_out(content: Content, clue_id: str) -> dict:

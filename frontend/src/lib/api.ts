@@ -141,7 +141,8 @@ export type MapLocation = {
   characters: { id: string; name: string }[]
 }
 export type MapPath = { character: string; name: string; stops: { location: string; note: string }[] }
-export type WorldMap = { level: number; map: MapMeta; locations: MapLocation[]; paths: MapPath[] }
+export type HousePin = { house: string; name: string; words: string; location: string; x: number; y: number; count: number; pct: number; crest: CrestSpec }
+export type WorldMap = { level: number; map: MapMeta; locations: MapLocation[]; paths: MapPath[]; houses: { total: number; items: HousePin[] }; my_house: string | null }
 export type GeoResult = { x: number; y: number; score: number; distance: number; answer: { id: string; name: string; x: number; y: number } }
 export type GeoSession = {
   id: number

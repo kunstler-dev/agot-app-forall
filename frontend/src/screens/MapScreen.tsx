@@ -6,7 +6,8 @@ import { Crest } from '../components/Crest'
 import { Icon } from '../components/icons'
 import { PanZoom, type View } from '../components/PanZoom'
 import { Button, Card, Pill, Sheet, Skeleton } from '../components/ui'
-import { api, errorText, type GeoSession, type MapLocation, type WorldMap } from '../lib/api'
+import { api, errorText, type GeoSession, type HousePin, type MapLocation, type WorldMap } from '../lib/api'
+import { crestDataUrl } from '../lib/heraldry'
 import { shareResult } from '../lib/share'
 import { haptic, hapticResult } from '../lib/telegram'
 import { t } from '../lib/texts'
@@ -60,6 +61,34 @@ function Pins({ v, data, selected, onPick, hidePins, path }: {
             </g>
           )
         })}
+    </svg>
+  )
+}
+
+function HouseLayer({ v, data, onPick }: { v: View; data: WorldMap; onPick: (h: HousePin) => void }) {
+  const sx = (x: number) => v.x + x * v.scale
+  const sy = (y: number) => v.y + y * v.scale
+  const max = Math.max(1, ...data.houses.items.map((h) => h.count))
+  const urls = useMemo(() => Object.fromEntries(data.houses.items.map((h) => [h.house, crestDataUrl(h.crest)])), [data.houses.items])
+  // several houses can share a seat: fan them out a little
+  const seen: Record<string, number> = {}
+  return (
+    <svg className="pointer-events-none absolute inset-0 h-full w-full">
+      {[...data.houses.items].reverse().map((h) => {
+        const k = seen[h.location] = (seen[h.location] ?? -1) + 1
+        const w = 26 + Math.round(22 * Math.sqrt(h.count / max))
+        const x = sx(h.x) + k * (w * 0.7)
+        const y = sy(h.y)
+        const mine = data.my_house === h.house
+        return (
+          <g key={h.house} className="pointer-events-auto cursor-pointer" onPointerDown={(e) => e.stopPropagation()} onPointerUp={(e) => { e.stopPropagation(); onPick(h) }} opacity={h.count ? 1 : 0.55}>
+            <image href={urls[h.house]} x={x - w / 2} y={y - w * 1.185} width={w} height={w * 1.185} />
+            {mine && <circle cx={x} cy={y - w * 1.185 - 6} r={4} fill="#F4C95D" stroke="#fff" strokeWidth={1.5} />}
+            <rect x={x - 17} y={y + 1} width={34} height={17} rx={8.5} fill={mine ? '#F4C95D' : '#0F1120'} stroke="#F4C95D" strokeWidth={1} />
+            <text x={x} y={y + 13} textAnchor="middle" fontSize={11} fontWeight={800} fontFamily="Manrope, sans-serif" fill={mine ? '#06070D' : '#F1F2F8'}>{h.count}</text>
+          </g>
+        )
+      })}
     </svg>
   )
 }
@@ -168,6 +197,8 @@ export function MapScreen() {
   const [pathsOpen, setPathsOpen] = useState(false)
   const [geoMenu, setGeoMenu] = useState(false)
   const [path, setPath] = useState<string | null>(null)
+  const [housesOn, setHousesOn] = useState(false)
+  const [house, setHouse] = useState<HousePin | null>(null)
   const [geo, setGeo] = useState<GeoSession | null>(null)
   const [guess, setGuess] = useState<{ x: number; y: number } | null>(null)
   const [phase, setPhase] = useState<'aim' | 'result'>('aim')
@@ -241,7 +272,8 @@ export function MapScreen() {
             onTap={onTap}
             overlay={(v) => (
               <>
-                <Pins v={v} data={data} selected={sel?.id ?? null} onPick={(l) => { haptic('light'); setSel(l) }} hidePins={!!geo} path={path} />
+                <Pins v={v} data={data} selected={sel?.id ?? null} onPick={(l) => { haptic('light'); setSel(l) }} hidePins={!!geo || housesOn} path={path} />
+                {housesOn && !geo && <HouseLayer v={v} data={data} onPick={(h) => { haptic('light'); setHouse(h) }} />}
                 {geo && <GeoOverlay v={v} guess={aiming ? guess : null} result={phase === 'result' ? geo.last ?? null : null} />}
               </>
             )}
@@ -269,6 +301,9 @@ export function MapScreen() {
                   <Icon name="eye" size={13} /> до: {cfg.tenant.spoiler_levels.find((l) => l.level === level)?.label}
                 </button>
               </div>
+              <button type="button" onClick={() => { haptic('light'); setHousesOn(!housesOn) }} className={`press flex h-[52px] w-[52px] flex-col items-center justify-center rounded-2xl border backdrop-blur ${housesOn ? 'border-gold bg-gold/20 text-ink' : 'border-line bg-surface/90 text-muted'}`}>
+                <Icon name="shield" size={20} /><span className="text-[9px] font-bold">Дома</span>
+              </button>
               <button type="button" onClick={() => setPathsOpen(true)} className={`press flex h-[52px] w-[52px] flex-col items-center justify-center rounded-2xl border backdrop-blur ${path ? 'border-nova bg-nova/20 text-ink' : 'border-line bg-surface/90 text-muted'}`}>
                 <Icon name="route" size={20} /><span className="text-[9px] font-bold">Пути</span>
               </button>
@@ -276,6 +311,13 @@ export function MapScreen() {
                 <Icon name="target" size={20} /><span className="text-[9px] font-bold">Где это?</span>
               </button>
             </div>
+            {housesOn && data && (
+              <div className="pointer-events-auto self-start">
+                <Pill className="border-gold/60 bg-surface/90 backdrop-blur">
+                  {data.houses.total ? `Игроков в домах: ${data.houses.total}` : 'Пока никто не прошёл тест'}
+                </Pill>
+              </div>
+            )}
             {path && data && (
               <div className="pointer-events-auto self-start">
                 <Pill className="border-nova/60 bg-surface/90 backdrop-blur">
@@ -327,6 +369,36 @@ export function MapScreen() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+      </Sheet>
+
+      <Sheet open={!!house} onClose={() => setHouse(null)}>
+        {house && data && (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-4">
+              <Crest spec={house.crest} size={64} />
+              <div className="flex-1">
+                <div className="font-display text-[28px] leading-tight font-bold">{house.name}</div>
+                {house.words && <div className="font-display text-[16px] italic text-gold">«{house.words}»</div>}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-center">
+              <Card className="p-3"><div className="text-[26px] font-extrabold">{house.count}</div><div className="text-[11px] font-bold text-dim uppercase">игроков</div></Card>
+              <Card className="p-3"><div className="text-[26px] font-extrabold text-gold">{house.pct}%</div><div className="text-[11px] font-bold text-dim uppercase">от всех домов</div></Card>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <div className="text-[11px] font-bold tracking-[0.18em] text-dim uppercase">Рейтинг домов</div>
+              {data.houses.items.filter((h) => h.count > 0).slice(0, 8).map((h, i) => (
+                <div key={h.house} className={`flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 ${h.house === house.house ? 'bg-gold/10' : ''}`}>
+                  <span className="w-5 text-center text-[13px] font-extrabold text-dim">{i + 1}</span>
+                  <Crest spec={h.crest} size={20} />
+                  <span className="flex-1 text-[14px] font-bold">{h.name}{h.house === data.my_house ? ' · ваш' : ''}</span>
+                  <span className="text-[13px] font-extrabold text-gold">{h.count}</span>
+                </div>
+              ))}
+              {data.houses.total === 0 && <div className="text-[13px] text-muted">Пройди тест «Какой ты дом?» в профиле — и твой голос появится на карте.</div>}
+            </div>
           </div>
         )}
       </Sheet>

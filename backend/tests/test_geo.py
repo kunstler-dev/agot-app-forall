@@ -51,3 +51,17 @@ async def test_daily_geo_is_shared_and_single(app, client):
         await client.post(f"/api/geo/{a['id']}/guess", json={"x": 500, "y": 700}, headers=auth(33))
     top = (await client.get("/api/geo/daily", headers=auth(34))).json()
     assert top["top"][0]["id"] == 33 and top["session"]["id"] == b["id"]
+
+
+async def test_house_layer_counts_players(app, client):
+    answers = len(app.state.content.quiz.questions)
+    for uid in (40, 41, 42):
+        await client.post("/api/quiz", json={"answers": [0] * answers}, headers=auth(uid))
+    m = (await client.get("/api/map", headers=auth(43))).json()
+    layer = m["houses"]
+    assert layer["total"] == 3
+    top = layer["items"][0]
+    assert top["count"] == 3 and top["pct"] == 100.0
+    assert top["location"] in {x["id"] for x in m["locations"]}
+    assert sum(i["count"] for i in layer["items"]) == 3
+    assert m["my_house"] is None
