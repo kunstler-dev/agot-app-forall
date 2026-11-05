@@ -11,6 +11,12 @@ export type Blazon = {
   charges: { charge: string; tincture: Tincture; count: number; arrangement: string }[]
   blazon?: string
   canon_exception?: boolean
+  /** a ready-made image inside the content directory; shown instead of the rendered blazon */
+  image?: string | null
+}
+
+export function crestImageUrl(b: Blazon): string | null {
+  return b.image ? `/api/content/file/${b.image}` : null
 }
 
 /** Charge artwork in a 100×100 box. Placeholders: fill='T' tincture with ink contour, stroke='T'

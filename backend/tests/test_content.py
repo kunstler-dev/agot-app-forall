@@ -67,3 +67,29 @@ async def test_prerendered_crest_is_served(client, app):
     if r.status_code == 200:
         assert r.headers["content-type"].startswith("image/svg")
     assert (await client.get("/api/heraldry/house/nope.svg")).status_code == 404
+
+
+async def test_crest_image_and_content_files(app, client, settings, tmp_path):
+    import json
+    import shutil
+    from app.content import Content
+    d = tmp_path / "c"
+    shutil.copytree(settings.content_dir, d)
+    (d / "heraldry" / "images").mkdir(parents=True, exist_ok=True)
+    (d / "heraldry" / "images" / "x.png").write_bytes(b"\x89PNG\r\n\x1a\n0000")
+    houses = json.loads((d / "houses.json").read_text())
+    houses[0]["crest"]["image"] = "heraldry/images/x.png"
+    (d / "houses.json").write_text(json.dumps(houses))
+    app.state.content = Content.load(d)
+    r = await client.get("/api/content/file/heraldry/images/x.png")
+    assert r.status_code == 200 and r.headers["content-type"] == "image/png"
+    assert (await client.get("/api/content/file/../../etc/passwd")).status_code == 404
+    assert (await client.get("/api/content/file/houses.json")).status_code == 404
+    cfg = (await client.get("/api/config")).json()
+    assert cfg["houses"][0]["crest"]["image"] == "heraldry/images/x.png" or any(h["crest"].get("image") for h in cfg["houses"])
+    houses[0]["crest"]["image"] = "heraldry/images/missing.png"
+    (d / "houses.json").write_text(json.dumps(houses))
+    import pytest
+    from app.content import ContentError
+    with pytest.raises(ContentError, match="missing.png"):
+        Content.load(d)

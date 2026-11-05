@@ -157,7 +157,12 @@ The Stella Nova Labs kit (logo, mark, bot icon, palette, fonts and usage rules) 
 
 ## Legal
 
-The engine and the demo world are MIT-licensed and original. A tenant that builds on an existing franchise is an unofficial fan project: it uses names and facts as text only, draws its own crests and maps, uses no stills, logos, fonts, music or actors' likenesses, and shows a disclaimer on its About screen. No paid features are built in.
+The engine and the demo world are MIT-licensed and original. A tenant built on an existing franchise is an unofficial fan project and shows a disclaimer on its About screen. Out of the box the engine draws crests from written blazons and maps with its own generator; a tenant may instead add its own images (`crest.image` per house, any image type as `map.file`). **The tenant is responsible for having the rights to every image it adds.** No paid features are built in.
+
+### Custom images
+
+- Crest: put the file in `content/heraldry/images/` and add `"image": "heraldry/images/<file>.png"` to the house's `crest`. The blazon stays as data (the daily crest puzzle still reveals it part by part); the image is shown everywhere else.
+- Map: set `"file"` in `content/locations.json → map` to any `.svg`, `.png`, `.jpg` or `.webp`, and keep `width`/`height` equal to the image's coordinate system, so location `x/y` stay correct.
 
 ## Contributing
 

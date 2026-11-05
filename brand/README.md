@@ -53,6 +53,6 @@ Both are under the SIL Open Font License.
 - No Cinzel, no Manrope, no Inter.
 - No stock icon packs and no emoji in the interface (emoji live only in the text people share to chats).
 - No pills, no `rounded-2xl` cards for everything.
-- No official artwork of any franchise: crests are drawn from written blazons by our renderer, maps by our generator.
+- By default crests come from written blazons through our renderer and maps from our generator; a tenant can swap in its own images (see the engine README).
 
 `scripts/check_design.sh` enforces most of this in CI.

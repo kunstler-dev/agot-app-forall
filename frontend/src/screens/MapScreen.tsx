@@ -6,7 +6,7 @@ import { PanZoom, type View } from '../components/PanZoom'
 import { Button, Radio, Rubric, Sheet, Skeleton } from '../components/ui'
 import { Crest } from '../heraldry'
 import { heraldryLib } from '../heraldry/store'
-import { blazonDataUrl } from '../heraldry/render'
+import { blazonDataUrl, crestImageUrl } from '../heraldry/render'
 import { Icon } from '../icons'
 import { api, errorText, type GeoSession, type HousePin, type MapLocation, type WorldMap } from '../lib/api'
 import { shareResult } from '../lib/share'
@@ -114,7 +114,7 @@ function HouseLayer({ v, data, onPick }: { v: View; data: WorldMap; onPick: (h: 
   const sx = (x: number) => v.x + x * v.scale
   const sy = (y: number) => v.y + y * v.scale
   const max = Math.max(1, ...data.houses.items.map((h) => h.count))
-  const urls = useMemo(() => Object.fromEntries(data.houses.items.map((h) => [h.house, blazonDataUrl(h.crest, heraldryLib(), { engraved: !h.count })])), [data.houses.items])
+  const urls = useMemo(() => Object.fromEntries(data.houses.items.map((h) => [h.house, crestImageUrl(h.crest) ?? blazonDataUrl(h.crest, heraldryLib(), { engraved: !h.count })])), [data.houses.items])
   const seen: Record<string, number> = {}
   return (
     <svg className="pointer-events-none absolute inset-0 h-full w-full">
@@ -354,7 +354,7 @@ export function MapScreen() {
               </>
             )}
           >
-            <img src="/api/content/map.svg" width={data.map.width} height={data.map.height} alt={data.map.title} draggable={false} className="pointer-events-none block max-w-none" />
+            <img src="/api/content/map" width={data.map.width} height={data.map.height} alt={data.map.title} draggable={false} className="pointer-events-none block max-w-none" />
           </PanZoom>
         )}
         {showGeoPanel && geo && (

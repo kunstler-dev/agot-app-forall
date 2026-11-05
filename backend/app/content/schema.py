@@ -66,6 +66,10 @@ class Crest(BaseModel):
     blazon: str = ""  # human-readable description
     # the canon breaks the tincture rule on purpose (metal on metal / colour on colour)
     canon_exception: bool = False
+    # Optional ready-made image (path inside the content directory, e.g. "heraldry/images/house.png").
+    # When set, the app shows this image instead of rendering the blazon. The tenant is responsible
+    # for having the rights to any image it adds.
+    image: str | None = None
 
     @model_validator(mode="after")
     def _check(self) -> Crest:
@@ -381,6 +385,9 @@ class Content:
                     errors.append(f"quiz {q.id}: weights for non-quiz houses {sorted(bad)}")
         if not (self.directory / self.map.file).exists():
             errors.append(f"map file {self.map.file} not found")
+        for h in self.houses.values():
+            if h.crest.image and not (self.directory / h.crest.image).is_file():
+                errors.append(f"house {h.id}: crest image {h.crest.image} not found")
         if errors:
             raise ContentError("content is invalid:\n  " + "\n  ".join(errors))
 

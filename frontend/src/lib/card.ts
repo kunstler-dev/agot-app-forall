@@ -2,13 +2,22 @@
 // a small Stella Nova mark in the corner. Flat paper and ink. Exported as JPEG for Telegram.
 
 import { heraldryLib } from '../heraldry/store'
-import { renderBlazon, type Blazon } from '../heraldry/render'
+import { crestImageUrl, renderBlazon, type Blazon } from '../heraldry/render'
 
 const PAPER = '#EFE6D2'
 const INK = '#2A2117'
 const MUTED = '#6E604B'
 const GILT = '#8C6A1F'
 const NOVA = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" stroke="${INK}"><path d="M64 8 L69 59 L120 64 L69 69 L64 120 L59 69 L8 64 L59 59 Z" stroke-width="2.4"/><path d="M64 30 L67 61 L98 64 L67 67 L64 98 L61 67 L30 64 L61 61 Z" stroke-width="1.5" transform="rotate(45 64 64)"/><circle cx="64" cy="64" r="3.4" fill="${INK}" stroke="none"/></svg>`
+
+function loadUrl(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = url
+  })
+}
 
 function loadSvg(svg: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -57,8 +66,10 @@ export async function houseCard(opts: { appName: string; house: string; words: s
   ctx.font = '500 30px "Alegreya SC", Georgia, serif'
   ctx.fillText(`${opts.appName.toLowerCase()} · какой ваш дом`, 110, 140)
   ctx.fillRect(110, 162, W - 220, 1.5)
-  const crest = await loadSvg(renderBlazon(opts.crest, heraldryLib()))
-  ctx.drawImage(crest, 110, 210, 330, 393)
+  const url = crestImageUrl(opts.crest)
+  const crest = url ? await loadUrl(url) : await loadSvg(renderBlazon(opts.crest, heraldryLib()))
+  const k = Math.min(330 / crest.width, 393 / crest.height)
+  ctx.drawImage(crest, 110 + (330 - crest.width * k) / 2, 210 + (393 - crest.height * k) / 2, crest.width * k, crest.height * k)
   ctx.fillStyle = MUTED
   ctx.font = '500 30px "Alegreya SC", Georgia, serif'
   ctx.fillText('ваш дом', 480, 300)

@@ -64,11 +64,28 @@ async def house_crest(house_id: str, content: ContentDep, engraved: bool = False
     return Response(f.read_bytes(), media_type="image/svg+xml", headers={"Cache-Control": "public, max-age=86400"})
 
 
+IMAGE_TYPES = {".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+               ".webp": "image/webp", ".avif": "image/avif"}
+
+
+@router.get("/content/map", include_in_schema=False)
 @router.get("/content/map.svg", include_in_schema=False)
-async def map_svg(content: ContentDep) -> Response:
+async def map_image(content: ContentDep) -> Response:
+    """The map file named in locations.json (any image type)."""
     f = (content.directory / content.map.file).resolve()
-    return Response(f.read_bytes(), media_type="image/svg+xml",
+    return Response(f.read_bytes(), media_type=IMAGE_TYPES.get(f.suffix.lower(), "application/octet-stream"),
                     headers={"Cache-Control": "public, max-age=3600"})
+
+
+@router.get("/content/file/{path:path}", include_in_schema=False)
+async def content_file(path: str, content: ContentDep) -> Response:
+    """Images from the content directory (crest images and the like). Only image types, no escaping it."""
+    base = content.directory.resolve()
+    f = (base / path).resolve()
+    if base not in f.parents or not f.is_file() or f.suffix.lower() not in IMAGE_TYPES:
+        raise HTTPException(404)
+    return Response(f.read_bytes(), media_type=IMAGE_TYPES[f.suffix.lower()],
+                    headers={"Cache-Control": "public, max-age=86400"})
 
 
 def user_out(request: Request, u: User) -> dict:
