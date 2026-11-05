@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/* Stella Nova Labs design tokens: deep night, cold blue-violet surfaces, star gold and nova violet.
+   A tenant may override --color-gold / --color-nova at runtime (tenant.json theme). */
+@theme {
+  --color-night: #06070D;
+  --color-bar: #0A0C16;
+  --color-surface: #0F1120;
+  --color-surface-2: #171A2E;
+  --color-surface-3: #1E2240;
+  --color-line: #23274A;
+  --color-line-2: #2E335C;
+  --color-ink: #F1F2F8;
+  --color-muted: #8E93AD;
+  --color-dim: #5E637F;
+  --color-gold: #F4C95D;
+  --color-gold-deep: #C9962E;
+  --color-nova: #8B7CFF;
+  --color-hit: #4CB27A;
+  --color-partial: #D9A93B;
+  --color-miss: #2A2E4A;
+  --color-danger: #E26D6D;
+  --color-parchment: #E9D9B4;
+  --font-display: "Cormorant Garamond", "Cormorant", Georgia, serif;
+  --font-brand: "Cinzel", "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Manrope", system-ui, sans-serif;
+}
+
+@layer base {
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-night);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* starry night behind every screen */
+.sky {
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(139, 124, 255, 0.16), transparent 60%),
+    radial-gradient(800px 400px at 100% 110%, rgba(244, 201, 93, 0.07), transparent 60%),
+    var(--color-night);
+}
+.sky::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.55), transparent 60%),
+    radial-gradient(1px 1px at 72% 9%, rgba(255, 255, 255, 0.45), transparent 60%),
+    radial-gradient(1.5px 1.5px at 38% 34%, rgba(244, 201, 93, 0.5), transparent 60%),
+    radial-gradient(1px 1px at 88% 41%, rgba(255, 255, 255, 0.35), transparent 60%),
+    radial-gradient(1px 1px at 22% 72%, rgba(255, 255, 255, 0.3), transparent 60%),
+    radial-gradient(1.5px 1.5px at 64% 63%, rgba(139, 124, 255, 0.55), transparent 60%),
+    radial-gradient(1px 1px at 52% 88%, rgba(255, 255, 255, 0.3), transparent 60%),
+    radial-gradient(1px 1px at 92% 82%, rgba(255, 255, 255, 0.35), transparent 60%);
+  z-index: 0;
+}
+
+button {
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.press {
+  transition: transform 0.08s ease-out, opacity 0.15s;
+}
+.press:active {
+  transform: scale(0.97);
+}
+
+.gold-text {
+  background: linear-gradient(180deg, #fff1c9 0%, var(--color-gold) 55%, var(--color-gold-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.parchment {
+  background-color: #e4d2a6;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.35), transparent 50%),
+    linear-gradient(160deg, #efe0bb, #dcc595);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--color-surface) 0%, var(--color-surface-2) 50%, var(--color-surface) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.safe-top {
+  padding-top: max(12px, env(safe-area-inset-top));
+}
