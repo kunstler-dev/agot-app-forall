@@ -6,7 +6,7 @@
  "subtitle": "составлено в Цитадели",
  "title_pos": [
   500,
-  70
+  72
  ],
  "compass": [
   880,
@@ -526,5 +526,27 @@
    "kind": "sea",
    "size": 20
   }
- ]
+ ],
+ "decor": [
+  {
+   "type": "ship",
+   "x": 150,
+   "y": 1000,
+   "scale": 1.0
+  },
+  {
+   "type": "serpent",
+   "x": 900,
+   "y": 1080,
+   "scale": 1.0
+  },
+  {
+   "type": "ship",
+   "x": 800,
+   "y": 130,
+   "scale": 0.9,
+   "flip": true
+  }
+ ],
+ "waves": 60
 }

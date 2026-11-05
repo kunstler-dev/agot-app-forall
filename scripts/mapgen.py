@@ -35,7 +35,8 @@ SEA_INK = "#4d5d63"
 PAPER = "#e9d9b4"
 PAPER_DARK = "#d8c290"
 LAND = "#efe1bd"
-SEA = "#c9c2a0"
+SEA = "#bcc6b8"
+SEA_DEEP = "#9fb0a6"
 
 
 def jitter_polygon(pts: list[list[float]], rnd: random.Random, detail: float, closed: bool = True,
@@ -153,6 +154,65 @@ def compass(x: float, y: float, r: float) -> str:
             f'font-family="Georgia, serif" fill="{INK}">N</text></g>')
 
 
+def waves(spec: dict, rnd: random.Random, polys: list) -> str:
+    """Small hand-drawn wave marks scattered over open sea."""
+    W, H = spec["width"], spec["height"]
+    out = []
+    tries = 0
+    while len(out) < spec.get("waves", 70) and tries < 4000:
+        tries += 1
+        x, y = rnd.uniform(40, W - 40), rnd.uniform(130, H - 40)
+        near = any(point_in_poly(x + dx, y + dy, p) for p in polys for dx, dy in
+                   ((0, 0), (40, 0), (-40, 0), (0, 40), (0, -40), (28, 28), (-28, -28), (28, -28), (-28, 28)))
+        if near:
+            continue
+        w = rnd.uniform(9, 14)
+        out.append(f'<path d="M{x - w:.0f},{y:.0f} q{w / 2:.1f},-5 {w:.1f},0 t{w:.1f},0" fill="none" '
+                   f'stroke="{SEA_INK}" stroke-width="1.1" stroke-opacity="0.45" stroke-linecap="round"/>')
+    return "<g>" + "".join(out) + "</g>"
+
+
+def ship(x: float, y: float, k: float, flip: bool) -> str:
+    sx = -k if flip else k
+    return (f'<g transform="translate({x} {y}) scale({sx} {k})" stroke="{INK}" stroke-width="{1.2 / k:.2f}" '
+            f'stroke-linejoin="round">'
+            f'<path d="M-22,0 L22,0 L16,9 L-16,9 Z" fill="#8a6a3a"/>'
+            f'<path d="M-2,0 L-2,-34 M10,0 L10,-24" fill="none"/>'
+            f'<path d="M-2,-32 C10,-28 12,-14 -2,-6 Z" fill="{LAND}"/>'
+            f'<path d="M10,-23 C18,-20 19,-10 10,-5 Z" fill="{LAND}"/>'
+            f'<path d="M-2,-34 L-12,-31 L-2,-28 Z" fill="#a3242c"/>'
+            f'<path d="M-30,12 q6,-4 12,0 t12,0 t12,0 t12,0 t12,0" fill="none" stroke="{SEA_INK}"/></g>')
+
+
+def serpent(x: float, y: float, k: float) -> str:
+    return (f'<g transform="translate({x} {y}) scale({k})" stroke="{INK}" stroke-width="{1.3 / k:.2f}" fill="#7f9a8a">'
+            f'<path d="M-40,6 C-34,-10 -24,-10 -20,4 C-16,-12 -4,-12 0,4 C4,-12 16,-12 20,4 L20,10 C16,0 6,0 2,10 '
+            f'C-2,0 -14,0 -18,10 C-22,0 -32,0 -36,12 Z"/>'
+            f'<path d="M20,4 C24,-8 34,-12 40,-6 L46,-8 L42,-2 C40,4 30,6 22,10 Z"/>'
+            f'<circle cx="37" cy="-5" r="1.4" fill="{INK}" stroke="none"/>'
+            f'<path d="M-30,16 q5,-3 10,0 t10,0 t10,0 t10,0 t10,0 t10,0" fill="none" stroke="{SEA_INK}"/></g>')
+
+
+def rhumbs(cx: float, cy: float, W: float, H: float) -> str:
+    L = math.hypot(W, H)
+    lines = "".join(f'<line x1="{cx}" y1="{cy}" x2="{cx + L * math.cos(math.radians(a)):.0f}" '
+                    f'y2="{cy + L * math.sin(math.radians(a)):.0f}"/>' for a in range(0, 360, 15))
+    return f'<g stroke="{INK}" stroke-width="0.7" stroke-opacity="0.13">{lines}</g>'
+
+
+def cartouche(x: float, y: float, title: str, subtitle: str) -> str:
+    w = max(300, len(title) * 31)
+    return (f'<g transform="translate({x} {y})">'
+            f'<path d="M{-w / 2 - 34},-6 L{-w / 2},-30 L{w / 2},-30 L{w / 2 + 34},-6 L{w / 2},18 L{-w / 2},18 Z" '
+            f'fill="{PAPER}" stroke="{INK}" stroke-width="2"/>'
+            f'<path d="M{-w / 2 - 22},-6 L{-w / 2 + 6},-24 L{w / 2 - 6},-24 L{w / 2 + 22},-6 L{w / 2 - 6},12 L{-w / 2 + 6},12 Z" '
+            f'fill="none" stroke="{INK}" stroke-width="0.8"/>'
+            f'<text x="0" y="2" text-anchor="middle" font-family="\'Cormorant Garamond\', Georgia, serif" '
+            f'font-size="34" font-weight="700" letter-spacing="7" fill="{INK}">{esc(title)}</text>'
+            f'<text x="0" y="44" text-anchor="middle" font-family="Georgia, serif" font-style="italic" '
+            f'font-size="15" fill="{INK_SOFT}">{esc(subtitle)}</text></g>')
+
+
 def esc(t: str) -> str:
     return t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
@@ -181,9 +241,16 @@ def render(spec: dict) -> str:
   </pattern>
   <path id="land" d="{all_land}"/>
   <clipPath id="landclip"><use href="#land"/></clipPath>
+<radialGradient id="seagrad" cx="50%" cy="45%" r="75%"><stop offset="0" stop-color="{SEA}"/><stop offset="1" stop-color="{SEA_DEEP}"/></radialGradient>
 </defs>
-<rect width="{W}" height="{H}" fill="{SEA}"/>
+<rect width="{W}" height="{H}" fill="url(#seagrad)"/>
 <rect width="{W}" height="{H}" fill="url(#seahatch)"/>''')
+    cx, cy = spec.get("compass", [W - 90, H - 110])
+    parts.append(rhumbs(cx, cy, W, H))
+    parts.append(waves(spec, rnd, [l["points"] for l in spec["lands"]]))
+    for d in spec.get("decor", []):
+        parts.append(ship(d["x"], d["y"], d.get("scale", 1), d.get("flip", False)) if d["type"] == "ship"
+                     else serpent(d["x"], d["y"], d.get("scale", 1)))
     # coastal ripples: the land outline stroked wide and faint, under the land
     for w, op in ((46, 0.10), (30, 0.16), (16, 0.22)):
         parts.append(f'<use href="#land" fill="none" stroke="{SEA_INK}" stroke-width="{w}" '
@@ -238,15 +305,10 @@ def render(spec: dict) -> str:
                      f'text-anchor="middle" font-family="\'Cormorant Garamond\', Georgia, serif" '
                      f'font-style="{style}" font-size="{size}" letter-spacing="{spacing}" fill="{color}" '
                      f'fill-opacity="0.85">{esc(lb["text"])}</text>')
-    cx, cy = spec.get("compass", [W - 90, H - 110])
-    parts.append(compass(cx, cy, 52))
+    parts.append(compass(cx, cy, spec.get("compass_size", 52)))
     if spec.get("title"):
         tx, ty = spec.get("title_pos", [W / 2, 62])
-        parts.append(f'<text x="{tx}" y="{ty}" text-anchor="middle" font-family="\'Cormorant Garamond\', Georgia, serif" '
-                     f'font-size="40" letter-spacing="6" fill="{INK}">{esc(spec["title"])}</text>')
-        if spec.get("subtitle"):
-            parts.append(f'<text x="{tx}" y="{ty + 26}" text-anchor="middle" font-family="Georgia, serif" '
-                         f'font-style="italic" font-size="15" fill="{INK_SOFT}">{esc(spec["subtitle"])}</text>')
+        parts.append(cartouche(tx, ty, spec["title"], spec.get("subtitle", "")))
     # paper texture over everything, then a vignette and a double frame
     parts.append(f'<rect width="{W}" height="{H}" fill="{PAPER}" opacity="0.18" filter="url(#paper)"/>')
     parts.append(f'<rect width="{W}" height="{H}" fill="url(#vignette)"/>')
