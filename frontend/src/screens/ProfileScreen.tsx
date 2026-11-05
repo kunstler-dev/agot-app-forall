@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { Avatar } from '../components/Avatar'
 import { MadeBy } from '../components/Nova'
-import { Button, Rubric, Skeleton } from '../components/ui'
+import { Art } from '../art'
+import { Button, Panel, Rubric, Skeleton } from '../components/ui'
 import { Crest } from '../heraldry'
 import { api } from '../lib/api'
 import { currentScheme, haptic, setScheme } from '../lib/telegram'
@@ -64,43 +65,60 @@ export function ProfileScreen() {
 
   const st = p?.daily.character
   return (
-    <div className="flex flex-col gap-6 px-5 pt-6 pb-10 safe-top">
-      <header className="double-rule-b flex flex-col items-center gap-3 pb-5 text-center">
-        <Avatar name={u.first_name} url={u.photo_url} size={72} />
-        <div>
-          <h1 className="sc m-0 text-xl font-medium">{u.first_name || 'Игрок'}</h1>
-          {u.username && <div className="text-sm text-ink-muted">@{u.username}</div>}
+    <div className="flex flex-col gap-4 px-4 pt-4 pb-10 safe-top">
+      <header className="relative overflow-hidden rounded-2xl border border-rule">
+        <div className="h-[120px] [&>svg]:h-full [&>svg]:w-full"><Art name="castle" /></div>
+        <div className="flex items-end gap-3 bg-paper-2 px-4 pb-4">
+          <div className="-mt-10"><Avatar name={u.first_name} url={u.photo_url} size={76} /></div>
+          <div className="min-w-0 flex-1 pb-1">
+            <h1 className="sc m-0 truncate text-[22px] leading-tight font-medium">{u.first_name || 'Игрок'}</h1>
+            {u.username && <div className="text-xs text-ink-muted">@{u.username}</div>}
+          </div>
+          <div className="num pb-1 text-right">
+            <div className="text-2xl leading-none font-extrabold text-gilt">{p?.user.points ?? u.points}</div>
+            <div className="text-[10px] font-extrabold text-ink-muted uppercase">{t('profile.points')}</div>
+          </div>
         </div>
-        {house ? (
-          <button type="button" onClick={() => open('quiz')} className="press flex flex-col items-center gap-1">
-            <Crest blazon={house.crest} size={72} />
-            <span className="sc text-base">{house.name}</span>
-            {house.words && <span className="text-sm italic text-ink-muted">«{house.words}»</span>}
-          </button>
-        ) : (
-          <Button kind="secondary" onClick={() => open('quiz')}>{t('quiz.cta')}: какой ваш дом</Button>
-        )}
       </header>
+
+      {house ? (
+        <Panel className="flex items-center gap-4 p-4" onClick={() => open('quiz')}>
+          <Crest blazon={house.crest} size={64} />
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] font-extrabold text-ink-muted uppercase">ваш дом</div>
+            <div className="sc text-lg leading-tight">{house.name}</div>
+            {house.words && <div className="serif text-sm italic text-gilt">«{house.words}»</div>}
+          </div>
+          <span className="text-xs font-extrabold text-ink-muted">пересдать</span>
+        </Panel>
+      ) : (
+        <Panel className="flex items-center gap-4 p-4">
+          <div className="flex-1">
+            <div className="sc text-lg">Какой ваш дом?</div>
+            <div className="text-xs text-ink-muted">Несколько вопросов, и герб в профиле</div>
+          </div>
+          <Button onClick={() => open('quiz')}>{t('quiz.cta')}</Button>
+        </Panel>
+      )}
 
       <section>
         <Rubric>Записи</Rubric>
         {!p ? <Skeleton lines={5} /> : (
-          <table className="num w-full border-collapse">
-            <tbody>
-              {[
-                ['Очки', p.user.points],
-                ['Место за неделю', p.ranks.week.rank ?? '—'],
-                ['Место за сезон', p.ranks.season.rank ?? '—'],
-                ['Место за всё время', p.ranks.all.rank ?? '—'],
-                ['Серия персонажа дня', st?.streak ?? 0],
-                ['Лучшая серия', st?.best_streak ?? 0],
-                ['Угадано персонажей', st?.won ?? 0],
-                ['Верных прогнозов', p.predictions_won],
-              ].map(([l, v]) => (
-                <tr key={String(l)} className="rule-b"><td className="py-1.5 text-ink-muted">{l}</td><td className="py-1.5 text-right">{v}</td></tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            {[
+              [p.ranks.week.rank ? `#${p.ranks.week.rank}` : '—', 'неделя'],
+              [p.ranks.season.rank ? `#${p.ranks.season.rank}` : '—', 'сезон'],
+              [p.ranks.all.rank ? `#${p.ranks.all.rank}` : '—', 'всё время'],
+              [st?.streak ?? 0, 'серия'],
+              [st?.won ?? 0, 'угадано'],
+              [p.predictions_won, 'прогнозы'],
+            ].map(([v, l]) => (
+              <Panel key={String(l)} className="num py-3 text-center">
+                <div className="text-xl leading-none font-extrabold">{v}</div>
+                <div className="mt-1 text-[10px] font-extrabold text-ink-muted uppercase">{l}</div>
+              </Panel>
+            ))}
+          </div>
         )}
       </section>
 

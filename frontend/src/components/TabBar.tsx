@@ -15,7 +15,7 @@ export function TabBar() {
   const tab = useApp((s) => s.tab)
   const setTab = useApp((s) => s.setTab)
   return (
-    <nav className="relative z-10 grid grid-cols-4 border-t border-rule-strong bg-paper pb-[max(10px,env(safe-area-inset-bottom))]">
+    <nav className="relative z-10 grid grid-cols-4 gap-1 border-t border-rule bg-paper px-2.5 pt-2 pb-[max(12px,env(safe-area-inset-bottom))]">
       {TABS.map(([id, icon, label]) => {
         const on = tab === id
         return (
@@ -26,10 +26,10 @@ export function TabBar() {
               if (!on) hapticSelect()
               setTab(id)
             }}
-            className={`-mt-px flex flex-col items-center gap-0.5 border-t-2 pt-2 pb-1 ${on ? 'border-ink text-ink' : 'border-transparent text-ink-muted'}`}
+            className={`press flex flex-col items-center gap-1 rounded-xl py-1.5 ${on ? 'bg-gilt/15 text-gilt' : 'text-ink-muted'}`}
           >
-            <Icon name={icon} size={22} />
-            <span className="sc text-xs">{t(label)}</span>
+            <Icon name={icon} size={23} />
+            <span className="text-[11px] font-extrabold">{t(label)}</span>
           </button>
         )
       })}

@@ -2,7 +2,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { useMemo, useState } from 'react'
 
-import { Button, Empty, LineInput, Rubric, Skeleton, Tabs, Title } from '../components/ui'
+import { Art } from '../art'
+import { Button, Empty, LineInput, Panel, Rubric, Skeleton, Tag, Tile, Title } from '../components/ui'
 import { Crest } from '../heraldry'
 import { Icon } from '../icons'
 import { api, errorText, type CharacterDaily, type CrestDaily, type Daily, type NameRef } from '../lib/api'
@@ -91,15 +92,15 @@ function Ledger({ data, labels }: { data: CharacterDaily; labels: { key: string;
         </thead>
         <tbody>
           {rows.map((g, ri) => (
-            <tr key={g.id} className="rule-b" style={{ gridTemplateColumns: cols }}>
-              <td className={`py-1.5 pr-2 text-sm leading-tight ${g.correct ? 'text-verdigris' : ''}`}>{g.name}</td>
+            <tr key={g.id} style={{ gridTemplateColumns: cols }}>
+              <td className={`py-1 pr-2 text-[13px] leading-tight font-extrabold ${g.correct ? 'text-verdigris' : ''}`}>{g.name}</td>
               {g.cells.map((c, i) => (
                 <td key={c.key} className="p-0.5">
                   <motion.div
                     initial={ri === 0 ? { rotateX: 90, opacity: 0 } : false}
                     animate={{ rotateX: 0, opacity: 1 }}
                     transition={{ ...ease, delay: ri === 0 ? i * 0.09 : 0 }}
-                    className={`flex min-h-[44px] flex-col items-center justify-center px-0.5 py-1 text-center leading-[1.15] ${CELL[c.status]}`}
+                    className={`flex min-h-[46px] flex-col items-center justify-center rounded-lg px-0.5 py-1 text-center text-[11px] leading-[1.15] font-bold ${CELL[c.status]}`}
                   >
                     <span className="line-clamp-2 break-words">{c.value}</span>
                     <span className="flex items-center gap-0.5 text-xs" aria-label={c.status}>
@@ -122,18 +123,19 @@ function Stats({ stats, max }: { stats: CharacterDaily['stats']; max: number }) 
   return (
     <section className="flex flex-col gap-2">
       <Rubric>Счёт</Rubric>
-      <table className="num w-full border-collapse text-sm">
-        <tbody>
-          {[
-            ['Сыграно', stats.played],
-            ['Угадано', stats.played ? `${stats.won} (${Math.round((100 * stats.won) / stats.played)}%)` : '—'],
-            ['Серия', stats.streak],
-            ['Лучшая серия', stats.best_streak],
-          ].map(([l, v]) => (
-            <tr key={String(l)} className="rule-b"><td className="py-1 text-ink-muted">{l}</td><td className="py-1 text-right">{v}</td></tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="grid grid-cols-4 gap-2">
+        {[
+          [stats.played, 'сыграно'],
+          [stats.played ? `${Math.round((100 * stats.won) / stats.played)}%` : '—', 'угадано'],
+          [stats.streak, 'серия'],
+          [stats.best_streak, 'рекорд'],
+        ].map(([v, l]) => (
+          <Panel key={String(l)} className="num py-2.5 text-center">
+            <div className="text-xl font-extrabold">{v}</div>
+            <div className="text-[10px] font-extrabold text-ink-muted uppercase">{l}</div>
+          </Panel>
+        ))}
+      </div>
       <div className="mt-2 flex flex-col gap-1">
         {Array.from({ length: max }, (_, i) => {
           const n = stats.dist[String(i + 1)] ?? 0
@@ -187,7 +189,7 @@ function CharacterGame({ daily, onUpdate }: { daily: Daily; onUpdate: (d: Daily)
           {used === 0 && <p className="m-0 text-sm italic text-ink-muted">{t('daily.character.prompt')}</p>}
         </section>
       ) : data.answer && (
-        <motion.section initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={ease} className="flex gap-4">
+        <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={ease} className="flex gap-4 rounded-2xl border-2 border-gilt/60 bg-paper-2 p-4">
           <Crest blazon={house?.crest} size={64} />
           <div className="min-w-0 flex-1">
             <div className="sc text-xs text-gilt">{data.solved ? `угадано с ${used}-й записи` : 'не угадано'}</div>
@@ -196,15 +198,15 @@ function CharacterGame({ daily, onUpdate }: { daily: Daily; onUpdate: (d: Daily)
             <p className="mt-2 mb-0 text-sm text-ink-muted">
               {data.solved && <><span className="num text-ink">+{data.points}</span> очков. </>}Следующий через <Countdown to={daily.next_ms} />.
             </p>
-            <Button kind="secondary" icon="seal" className="mt-3" onClick={async () => shareResult('share_daily', (await api.dailyShare('character')).text)}>Отправить без спойлеров</Button>
+            <Button kind="gilt" icon="seal" className="mt-3 w-full" onClick={async () => shareResult('share_daily', (await api.dailyShare('character')).text)}>Отправить без спойлеров</Button>
           </div>
         </motion.section>
       )}
 
       {(data.hints.quote || data.hints.crest || (!data.finished && used > 0)) && (
-        <aside className="grid grid-cols-[1fr_auto] gap-4 border-l-2 border-gilt pl-3">
+        <aside className="grid grid-cols-[1fr_auto] gap-4 rounded-2xl border border-rule bg-paper-2 p-3.5">
           <div>
-            <div className="sc text-xs text-ink-muted">приписка на полях</div>
+            <Tag>приписка</Tag>
             {data.hints.quote
               ? <p className="m-0 text-base italic">{data.hints.quote}</p>
               : <p className="m-0 text-sm text-ink-muted">Приписка появится после {roman(cfg.tenant.daily.hint_quote_after)}-й записи.</p>}
@@ -259,7 +261,7 @@ function CrestGame({ daily, onUpdate }: { daily: Daily; onUpdate: (d: Daily) => 
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="flex flex-col items-center gap-3 py-2">
+      <section className="flex flex-col items-center gap-3 rounded-2xl border border-rule bg-paper-2 p-5">
         <motion.div key={`${data.stage.engraved}${data.stage.fade}`} initial={{ opacity: 0.4 }} animate={{ opacity: 1 }} transition={{ duration: 0.22 }}>
           <Crest blazon={data.answer?.crest ?? data.stage.crest} engraved={!data.answer && data.stage.engraved} fade={data.answer ? 1 : data.stage.fade} size={150} />
         </motion.div>
@@ -288,7 +290,7 @@ function CrestGame({ daily, onUpdate }: { daily: Daily; onUpdate: (d: Daily) => 
       )}
       {data.finished && (
         <div className="flex flex-col items-start gap-2">
-          <Button kind="secondary" icon="seal" onClick={async () => shareResult('share_crest', (await api.dailyShare('crest')).text)}>Отправить</Button>
+          <Button kind="gilt" icon="seal" className="w-full" onClick={async () => shareResult('share_crest', (await api.dailyShare('crest')).text)}>Отправить</Button>
           <p className="m-0 text-sm text-ink-muted">Новый герб через <Countdown to={daily.next_ms} />.</p>
         </div>
       )}
@@ -305,11 +307,18 @@ export function TodayScreen() {
   const d = q.data
 
   return (
-    <div className="flex flex-col gap-5 px-5 pt-4 pb-10 safe-top">
+    <div className="flex flex-col gap-4 px-4 pt-4 pb-10 safe-top">
       <Title folio={d ? `№${d.number}` : undefined} sub={<>{cfg.tenant.app_name}{d && d.character.stats.streak > 0 && <>, серия <span className="num">{d.character.stats.streak}</span></>}</>}>
         {mode === 'character' ? t('daily.character') : t('daily.crest')}
       </Title>
-      <Tabs value={mode} onChange={setMode} options={[['character', `${t('daily.character')}${d?.character.finished ? ' ✓' : ''}`], ['crest', `${t('daily.crest')}${d?.crest.finished ? ' ✓' : ''}`]]} />
+      <div className="grid grid-cols-2 gap-3">
+        <Tile art={<Art name="hood" />} active={mode === 'character'} onClick={() => setMode('character')}
+          tag={d?.character.finished ? (d.character.solved ? 'угадано' : 'сыграно') : 'новый'} tagTone={d?.character.finished ? 'verdigris' : 'wax'}
+          title={t('daily.character')} text={d ? `${d.character.guesses.length} из ${d.character.max_attempts} записей` : ' '} />
+        <Tile art={<Art name="shield" />} active={mode === 'crest'} onClick={() => setMode('crest')}
+          tag={d?.crest.finished ? (d.crest.solved ? 'угадано' : 'сыграно') : 'новый'} tagTone={d?.crest.finished ? 'verdigris' : 'wax'}
+          title={t('daily.crest')} text={d ? `${d.crest.guesses.length} из ${d.crest.max_attempts} попыток` : ' '} />
+      </div>
       {q.isError ? <Empty text="Ворон не долетел. Попробуйте ещё раз." /> : !d ? <Skeleton lines={5} /> : mode === 'character' ? <CharacterGame daily={d} onUpdate={update} /> : <CrestGame daily={d} onUpdate={update} />}
     </div>
   )

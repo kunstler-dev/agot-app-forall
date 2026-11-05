@@ -2,7 +2,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 
 import { Avatar } from '../components/Avatar'
-import { Empty, Radio, Rubric, ShareLine, Skeleton, Tabs, Title } from '../components/ui'
+import { Art } from '../art'
+import { artFor } from '../art/pick'
+import { Empty, Panel, Radio, Rubric, ShareLine, Skeleton, Tabs, Tag, Title } from '../components/ui'
 import { Crest } from '../heraldry'
 import { Icon } from '../icons'
 import { api, errorText, type PEvent, type Top, type TopRow } from '../lib/api'
@@ -21,13 +23,17 @@ function Entry({ e, onVote }: { e: PEvent; onVote: (id: number, opt: number) => 
   const now = useNow()
   const resolved = e.status === 'resolved'
   return (
-    <article className="rule-b grid grid-cols-[3.4rem_1fr] gap-x-3 py-4">
-      <div className="flex flex-col gap-1 pt-1 text-xs text-ink-muted">
-        <span className="num">{date(e.deadline_ms)}</span>
-        {e.tag && <span className="sc leading-tight">{e.tag}</span>}
+    <article className="mb-3 overflow-hidden rounded-2xl border border-rule bg-paper-2">
+      <div className="relative h-[84px] overflow-hidden [&>svg]:h-full [&>svg]:w-full">
+        <Art name={artFor(e.tag || e.question)} />
+        <div className="absolute top-2.5 left-3 flex gap-1.5">
+          {e.tag && <Tag>{e.tag}</Tag>}
+          <Tag tone={e.open ? 'wax' : resolved ? 'verdigris' : 'muted'}>{e.open ? 'приём открыт' : resolved ? 'итог' : 'ждём итога'}</Tag>
+        </div>
+        <span className="num absolute top-2.5 right-3 text-[11px] font-extrabold text-ink-muted">{date(e.deadline_ms)}</span>
       </div>
-      <div className="flex flex-col gap-3">
-        <h2 className="m-0 text-lg leading-snug font-normal">{e.question}</h2>
+      <div className="flex flex-col gap-3 p-4">
+        <h2 className="m-0 text-[17px] leading-snug font-extrabold">{e.question}</h2>
         <div className="flex items-center gap-1.5 text-sm text-ink-muted">
           <Icon name={e.open ? 'hourglass' : 'lock'} size={16} />
           {resolved ? 'итог подведён' : e.open ? `до закрытия ${timeLeft(e.deadline_ms - now)}` : 'приём закрыт, ждём итога'}
@@ -41,7 +47,7 @@ function Entry({ e, onVote }: { e: PEvent; onVote: (id: number, opt: number) => 
             return (
               <li key={i}>
                 <button type="button" disabled={!e.open || busy} onClick={async () => { setBusy(true); await onVote(e.id, i); setBusy(false) }}
-                  className="press flex w-full flex-col gap-1 text-left disabled:active:opacity-100">
+                  className={`press flex w-full flex-col gap-1.5 rounded-xl border-2 px-3 py-2.5 text-left ${mine ? 'border-gilt bg-gilt/10' : correct ? 'border-verdigris' : 'border-rule'}`}>
                   <span className="flex w-full items-start gap-2.5">
                     <span className="mt-1"><Radio on={mine} /></span>
                     <span className={`flex-1 ${correct ? 'text-verdigris' : ''}`}>{o}{correct ? ' ✓' : ''}</span>
@@ -132,9 +138,15 @@ export function PredictionsScreen() {
   const open = list.filter((e) => e.open)
   const closed = list.filter((e) => !e.open)
   return (
-    <div className="flex flex-col gap-4 px-5 pt-4 pb-10 safe-top">
+    <div className="flex flex-col gap-4 px-4 pt-4 pb-10 safe-top">
       <Title sub={t('predictions.subtitle')}>{t('predictions.title')}</Title>
-      <Tabs value={view} onChange={setView} options={[['events', 'Хроника'], ['top', 'Рейтинг']]} />
+      <Tabs value={view} onChange={setView} options={[['events', 'События'], ['top', 'Рейтинг']]} />
+      {view === 'top' && (
+        <Panel className="relative h-[96px] overflow-hidden [&>svg]:h-full [&>svg]:w-full">
+          <Art name="crown" />
+          <span className="sc absolute bottom-2.5 left-4 text-xl text-ink">рейтинг канала</span>
+        </Panel>
+      )}
       {view === 'events' ? (
         !events.data ? <Skeleton lines={7} /> : list.length === 0 ? <Empty text="Записей пока нет. Автор добавит прогнозы к новым сериям." /> : (
           <div>

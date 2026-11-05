@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
+import { Art } from '../art'
 import { Button, Radio, Rubric, Skeleton } from '../components/ui'
 import { Crest } from '../heraldry'
 import { api, errorText, type HouseStats, type QuizResult } from '../lib/api'
@@ -101,6 +102,7 @@ export function QuizScreen({ onboarding = false, onDone }: { onboarding?: boolea
           </motion.div>
         ) : step < 0 ? (
           <div className="flex flex-1 flex-col justify-center gap-5">
+            <div className="h-[150px] overflow-hidden rounded-2xl border border-rule [&>svg]:h-full [&>svg]:w-full"><Art name="castle" /></div>
             <h1 className="sc m-0 text-2xl leading-tight font-medium">{q.title}</h1>
             <p className="dropcap m-0 text-base">{onboarding && cfg.tenant.welcome ? `${cfg.tenant.welcome} ` : ''}{q.intro}</p>
             <div className="flex gap-1.5 py-1">
@@ -117,8 +119,8 @@ export function QuizScreen({ onboarding = false, onDone }: { onboarding?: boolea
                 <h2 className="m-0 text-lg leading-snug font-normal">{q.questions[step].text}</h2>
                 <ul className="col-start-2 mt-4 mb-0 list-none p-0">
                   {q.questions[step].answers.map((a, i) => (
-                    <li key={i} className="rule-b">
-                      <button type="button" disabled={busy} onClick={() => pick(i)} className="press flex w-full items-start gap-3 py-3 text-left text-base">
+                    <li key={i} className="mb-2">
+                      <button type="button" disabled={busy} onClick={() => pick(i)} className={`press flex w-full items-start gap-3 rounded-xl border-2 p-3.5 text-left text-[15px] ${answers[step] === i ? 'border-gilt bg-gilt/10' : 'border-rule bg-paper-2'}`}>
                         <span className="mt-1"><Radio on={answers[step] === i} /></span>
                         {a}
                       </button>

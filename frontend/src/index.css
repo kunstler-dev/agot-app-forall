@@ -18,7 +18,8 @@
   --color-ochre: #C08A2E;
   --color-slate: #4A463F;
   --color-on-wax: #F4EBDB;
-  --font-sans: "Alegreya", "Georgia", serif;
+  --font-sans: "Manrope", system-ui, sans-serif;
+  --font-serif: "Alegreya", "Georgia", serif;
   --font-sc: "Alegreya SC", "Alegreya", "Georgia", serif;
   --text-xs: 13px;
   --text-sm: 15px;
@@ -55,9 +56,9 @@
     background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-size: 17px;
+    font-size: 15px;
     line-height: 1.45;
-    font-variant-numeric: oldstyle-nums;
+    font-weight: 600;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
     -webkit-font-smoothing: antialiased;
@@ -106,10 +107,23 @@
     border-bottom: 3px double var(--color-rule-strong);
   }
   .press {
-    transition: opacity 0.15s ease-out;
+    transition: transform 0.08s ease-out, opacity 0.15s;
   }
   .press:active {
-    opacity: 0.6;
+    transform: scale(0.97);
+  }
+  /* a chunky, pressable button: a solid ledge under it that disappears on press */
+  .ledge {
+    box-shadow: 0 4px 0 0 var(--ledge, rgba(0, 0, 0, 0.45));
+    transition: transform 0.07s ease-out, box-shadow 0.07s ease-out;
+  }
+  .ledge:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 0 var(--ledge, rgba(0, 0, 0, 0.45));
+  }
+  .serif {
+    font-family: var(--font-serif);
+    font-weight: 400;
   }
   .no-scrollbar {
     scrollbar-width: none;

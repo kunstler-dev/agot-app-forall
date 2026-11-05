@@ -230,9 +230,9 @@ function GeoPanel({ session, guess, showingResult, onConfirm, onNext, onClose, b
 
 function MapButton({ icon, label, on, onClick }: { icon: 'shield' | 'quill' | 'compass'; label: string; on?: boolean; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className={`press flex items-center gap-1.5 border-b-2 pb-1 ${on ? 'border-ink text-ink' : 'border-transparent text-ink-muted'}`}>
-      <Icon name={icon} size={18} />
-      <span className="sc text-xs">{label}</span>
+    <button type="button" onClick={() => { haptic('light'); onClick() }} className={`ledge flex flex-1 items-center justify-center gap-1.5 rounded-xl border-2 py-2 text-xs font-extrabold [--ledge:rgba(0,0,0,0.5)] ${on ? 'border-gilt bg-gilt/15 text-gilt' : 'border-rule-strong bg-paper-2 text-ink'}`}>
+      <Icon name={icon} size={17} />
+      {label}
     </button>
   )
 }
@@ -318,24 +318,24 @@ export function MapScreen() {
   return (
     <div className="relative flex h-full flex-col">
       {!showGeoPanel && (
-        <div className="double-rule-b relative z-10 bg-paper px-4 pt-3 pb-2 safe-top">
+        <div className="relative z-10 border-b border-rule bg-paper px-4 pt-3 pb-3 safe-top">
           <div className="flex items-baseline justify-between">
             <h1 className="sc m-0 text-lg font-medium">{t('map.title')}</h1>
             <button type="button" onClick={() => setSpoilerOpen(true)} className="flex items-center gap-1 text-sm italic text-ink-muted">
               <Icon name="lock" size={15} /> до: {cfg.tenant.spoiler_levels.find((l) => l.level === level)?.label}
             </button>
           </div>
-          <div className="mt-2 flex gap-5">
+          <div className="mt-2.5 flex gap-2">
             <MapButton icon="shield" label="Дома" on={housesOn} onClick={() => { haptic('light'); setHousesOn(!housesOn) }} />
             <MapButton icon="quill" label="Пути" on={!!path} onClick={() => setPathsOpen(true)} />
             <MapButton icon="compass" label="Где это?" onClick={() => setGeoMenu(true)} />
-            {housesOn && data && <span className="num ml-auto self-center text-xs text-ink-muted">в домах: {data.houses.total}</span>}
-            {path && data && !housesOn && (
-              <button type="button" onClick={() => setPath(null)} className="ml-auto self-center text-xs italic text-wax">
-                {data.paths.find((p) => p.character === path)?.name} ×
-              </button>
-            )}
           </div>
+          {housesOn && data && <div className="num mt-2 text-xs font-bold text-ink-muted">Игроков в домах: {data.houses.total}</div>}
+          {path && data && !housesOn && (
+            <button type="button" onClick={() => setPath(null)} className="mt-2 text-xs font-bold text-wax">
+              Путь: {data.paths.find((p) => p.character === path)?.name} ×
+            </button>
+          )}
         </div>
       )}
       <div className="map-surface relative min-h-0 flex-1">

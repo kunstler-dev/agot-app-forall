@@ -6,13 +6,47 @@ import { bindBack, haptic } from '../lib/telegram'
 import { ease } from '../lib/format'
 import { useToast } from '../lib/toast'
 
-/** A distinct object (location card, result card): 1px rule, 2px corners, flat. */
+/** A card: rounded, framed, raised. The main building block of every screen. */
 export function Panel({ children, className = '', onClick }: { children: ReactNode; className?: string; onClick?: () => void }) {
   return (
-    <div onClick={onClick} className={`rounded-sm border border-rule bg-paper-2 ${onClick ? 'press cursor-pointer' : ''} ${className}`}>
+    <div onClick={onClick} className={`rounded-2xl border border-rule bg-paper-2 ${onClick ? 'press cursor-pointer' : ''} ${className}`}>
       {children}
     </div>
   )
+}
+
+/** A big tappable tile with an illustration on top, a tag and a title, like the game tiles in ELT. */
+export function Tile({ art, tag, tagTone = 'gilt', title, text, onClick, active, className = '' }: {
+  art: ReactNode
+  tag?: ReactNode
+  tagTone?: 'gilt' | 'wax' | 'verdigris'
+  title: ReactNode
+  text?: ReactNode
+  onClick?: () => void
+  active?: boolean
+  className?: string
+}) {
+  return (
+    <button type="button" onClick={() => { haptic('light'); onClick?.() }}
+      className={`press relative flex flex-col overflow-hidden rounded-2xl border-2 bg-paper-2 text-left ${active ? 'border-gilt' : 'border-rule'} ${className}`}>
+      <div className="h-[92px] w-full overflow-hidden [&>svg]:h-full [&>svg]:w-full">{art}</div>
+      <div className="flex flex-col gap-1 p-3">
+        {tag && <Tag tone={tagTone}>{tag}</Tag>}
+        <span className="text-[15px] leading-tight font-extrabold">{title}</span>
+        {text && <span className="text-xs leading-snug text-ink-muted">{text}</span>}
+      </div>
+    </button>
+  )
+}
+
+export function Tag({ children, tone = 'gilt' }: { children: ReactNode; tone?: 'gilt' | 'wax' | 'verdigris' | 'muted' }) {
+  const t = {
+    gilt: 'bg-gilt/15 text-gilt',
+    wax: 'bg-wax/18 text-wax',
+    verdigris: 'bg-verdigris/20 text-verdigris',
+    muted: 'bg-ink/8 text-ink-muted',
+  }[tone]
+  return <span className={`inline-flex w-fit items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-extrabold ${t}`}>{children}</span>
 }
 
 export function Button({
@@ -25,14 +59,15 @@ export function Button({
 }: {
   children: ReactNode
   onClick?: () => void
-  kind?: 'primary' | 'secondary' | 'link'
+  kind?: 'primary' | 'secondary' | 'gilt' | 'link'
   disabled?: boolean
   icon?: IconName
   className?: string
 }) {
   const styles = {
-    primary: 'bg-wax text-on-wax px-5 py-3',
-    secondary: 'border border-rule-strong text-ink px-5 py-3',
+    primary: 'ledge bg-wax text-on-wax [--ledge:#6E1C17] px-5 py-3.5',
+    gilt: 'ledge bg-gilt text-paper [--ledge:#7A5F22] px-5 py-3.5',
+    secondary: 'ledge border-2 border-rule-strong bg-paper-2 text-ink [--ledge:rgba(0,0,0,0.5)] px-5 py-3',
     link: 'text-ink underline decoration-rule-strong underline-offset-4 px-0 py-1',
   }[kind]
   return (
@@ -40,12 +75,12 @@ export function Button({
       type="button"
       disabled={disabled}
       onClick={() => {
-        haptic('light')
+        haptic(kind === 'link' ? 'light' : 'medium')
         onClick?.()
       }}
-      className={`press inline-flex items-center justify-center gap-2 rounded-sm text-base disabled:opacity-40 ${kind === 'link' ? '' : 'sc'} ${styles} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-xl text-[15px] font-extrabold disabled:opacity-45 ${styles} ${className}`}
     >
-      {icon && <Icon name={icon} size={18} />}
+      {icon && <Icon name={icon} size={19} />}
       {children}
     </button>
   )
@@ -54,7 +89,7 @@ export function Button({
 /** Page title: small caps, left aligned, an optional folio mark in the margin. */
 export function Title({ children, folio, sub, onBack }: { children: ReactNode; folio?: string; sub?: ReactNode; onBack?: () => void }) {
   return (
-    <header className="double-rule-b pb-3">
+    <header className="pb-1">
       <div className="flex items-baseline gap-3">
         {onBack && (
           <button type="button" aria-label="Назад" onClick={onBack} className="press -ml-1 self-center text-ink-muted">
@@ -62,7 +97,7 @@ export function Title({ children, folio, sub, onBack }: { children: ReactNode; f
           </button>
         )}
         {folio && <span className="sc w-6 shrink-0 text-xs text-gilt">{folio}</span>}
-        <h1 className="sc m-0 text-xl leading-tight font-medium">{children}</h1>
+        <h1 className="sc m-0 text-[28px] leading-none font-medium">{children}</h1>
       </div>
       {sub && <div className={`mt-1 text-sm text-ink-muted ${folio ? 'pl-9' : ''}`}>{sub}</div>}
     </header>
@@ -79,10 +114,10 @@ export function Rubric({ children, right }: { children: ReactNode; right?: React
   )
 }
 
-/** Text tabs: the active one is ink with a rule above, the rest are muted. */
+/** Segmented control: the active option is a solid chip. */
 export function Tabs<T extends string>({ value, options, onChange }: { value: T; options: [T, string][]; onChange: (v: T) => void }) {
   return (
-    <div className="rule-b flex gap-5">
+    <div className="grid gap-1 rounded-xl border border-rule bg-paper-2 p-1" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
       {options.map(([v, label]) => (
         <button
           key={v}
@@ -91,7 +126,7 @@ export function Tabs<T extends string>({ value, options, onChange }: { value: T;
             haptic('light')
             onChange(v)
           }}
-          className={`sc -mb-px border-b-2 pt-1 pb-2 text-sm ${v === value ? 'border-ink text-ink' : 'border-transparent text-ink-muted'}`}
+          className={`press rounded-lg py-2 text-[13px] font-extrabold transition-colors ${v === value ? 'bg-gilt text-paper' : 'text-ink-muted'}`}
         >
           {label}
         </button>
@@ -103,14 +138,14 @@ export function Tabs<T extends string>({ value, options, onChange }: { value: T;
 /** A writing line: only the bottom rule, like a ledger entry. */
 export function LineInput({ value, onChange, placeholder, disabled, onClear }: { value: string; onChange: (v: string) => void; placeholder: string; disabled?: boolean; onClear?: () => void }) {
   return (
-    <div className="flex items-center gap-2 border-b border-rule-strong focus-within:border-ink">
+    <div className="flex items-center gap-2 rounded-xl border-2 border-rule-strong bg-paper px-3 focus-within:border-gilt">
       <Icon name="quill" size={18} className="shrink-0 text-ink-muted" />
       <input
         value={value}
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-11 min-w-0 flex-1 bg-transparent text-base italic outline-none placeholder:text-ink-muted"
+        className="h-12 min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-ink-muted"
         autoComplete="off"
         autoCorrect="off"
         spellCheck={false}
@@ -180,12 +215,13 @@ export function Sheet({ open, onClose, children, title }: { open: boolean; onClo
         <>
           <motion.div className="fixed inset-0 z-40 bg-black/45" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={ease} onClick={onClose} />
           <motion.div
-            className="no-scrollbar double-rule-t fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[86vh] max-w-[480px] overflow-y-auto bg-paper-2 px-5 pt-4 pb-[max(20px,env(safe-area-inset-bottom))]"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={ease}
+            className="no-scrollbar fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[86vh] max-w-[480px] overflow-y-auto rounded-t-3xl border-t-2 border-rule-strong bg-paper-2 px-5 pt-3 pb-[max(20px,env(safe-area-inset-bottom))]"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', stiffness: 380, damping: 38 }}
           >
+            <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-rule-strong" />
             <div className="mb-3 flex items-baseline justify-between gap-3">
               {title ? <h2 className="sc m-0 text-lg font-medium">{title}</h2> : <span />}
               <button type="button" aria-label="Закрыть" onClick={onClose} className="press text-ink-muted">
@@ -207,7 +243,7 @@ export function Toaster() {
       <AnimatePresence>
         {text && (
           <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={ease}
-            className="rounded-sm border border-rule-strong bg-paper-2 px-4 py-2 text-sm italic">
+            className="rounded-xl border border-rule-strong bg-paper-2 px-4 py-2.5 text-sm font-bold shadow-xl">
             {text}
           </motion.div>
         )}

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import { Art } from '../art'
 import { Avatar } from '../components/Avatar'
 import { MadeBy } from '../components/Nova'
 import { Button } from '../components/ui'
@@ -35,11 +36,12 @@ export function SubscribeGate() {
   }
 
   return (
-    <div className="paper mx-auto flex h-full max-w-[480px] flex-col px-7 pt-14 pb-[max(24px,env(safe-area-inset-bottom))]">
+    <div className="paper mx-auto flex h-full max-w-[480px] flex-col px-5 pt-8 pb-[max(24px,env(safe-area-inset-bottom))]">
       <div className="relative flex flex-1 flex-col">
         <div className="sc text-xs text-gilt">{cfg.tenant.app_name}</div>
-        <div className="double-rule-t mt-2 pt-8">
-          <Avatar name={sub.title || sub.channel} size={84} />
+        <div className="mt-3 h-[150px] overflow-hidden rounded-2xl border border-rule [&>svg]:h-full [&>svg]:w-full"><Art name="raven" /></div>
+        <div className="pt-5">
+          <Avatar name={sub.title || sub.channel} size={72} />
           <h1 className="sc mt-6 mb-2 text-xl font-medium">{t('gate.title')}</h1>
           <p className="m-0 text-base text-ink-muted">{cfg.tenant.channel_about || t('gate.text')}</p>
           <p className="mt-4 mb-0 text-base italic">{sub.title ? `${sub.title}, ${sub.channel}` : sub.channel}</p>

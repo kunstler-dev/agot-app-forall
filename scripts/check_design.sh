@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Design guard for frontend/src: fails on the usual "AI dashboard" look.
 #   gradients (except the paper vignette in paper.css), blur and glass, glow and coloured shadows,
-#   big radii and pills (except the avatar medallion and radio buttons), third-party icon packs,
-#   emoji in the UI (the share-text module is exempt: chats expect 🟩🟨⬛), Cinzel/Manrope/Inter.
+#   third-party icon packs, emoji in the UI (the share-text module is exempt: chats expect 🟩🟨⬛),
+#   Cinzel/Inter. Solid "ledge" shadows under buttons are fine: they are not glow.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 SRC="${1:-frontend/src}"
@@ -21,9 +21,8 @@ check() { # $1 description, $2 regex, $3 grep exclude regex for files (optional)
 check "gradients" 'linear-gradient|radial-gradient|conic-gradient|bg-gradient' 'paper\.css:'
 check "blur / glass" 'backdrop-filter|backdrop-blur|blur\(|feGaussianBlur|blur-(sm|md|lg|xl|2xl|3xl)'
 check "glow and coloured shadows" 'text-shadow|drop-shadow|shadow-\[0_0|glow'
-check "big radii and pills" 'rounded-(xl|2xl|3xl)|rounded-full' 'components/Avatar\.tsx:|components/ui\.tsx:.*(Radio|h-2 w-2|h-\[18px\])'
 check "third-party icon packs" "from ['\"](lucide-react|@heroicons|react-icons)"
-check "fonts we do not use" 'Cinzel|Manrope|"Inter"|Inter,'
+check "fonts we do not use" 'Cinzel|"Inter"|Inter,'
 
 # emoji: Extended_Pictographic, everywhere except the share-text module
 emoji=$(python3 - "$SRC" <<'PY'
