@@ -27,6 +27,9 @@ def settings(tmp_path):
 @pytest.fixture
 async def app(settings):
     a = create_app(settings)
+    # every module is on in tests, whatever the tenant has switched off (test_chat checks the switches)
+    a.state.tenant.features.predictions = True
+    a.state.tenant.features.chat = True
     db = Database(settings.db_url)
     await db.create_schema()
     a.state.db = db
