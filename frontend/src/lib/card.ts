@@ -1,4 +1,4 @@
-// Result cards for sharing: drawn on a canvas in the Stella Nova style and exported as PNG.
+// Result cards for sharing: drawn on a canvas in the Stella Nova style and exported as JPEG (small enough for Telegram).
 
 import { crestSvg, type CrestSpec } from './heraldry'
 
@@ -113,5 +113,5 @@ export async function houseCard(opts: {
     y += 66
   }
   await brandCorner(ctx, W, H)
-  return c.toDataURL('image/png')
+  return c.toDataURL('image/jpeg', 0.9)
 }

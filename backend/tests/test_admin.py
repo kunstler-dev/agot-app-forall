@@ -42,6 +42,10 @@ async def test_share_card_upload(client):
     cid = r.json()["id"]
     got = await client.get(f"/api/share/card/{cid}.png")
     assert got.status_code == 200 and got.content == png
+    jpg = b"\xff\xd8\xff\xe0" + b"1" * 50
+    r = await client.post("/api/share/card", json={"png_base64": base64.b64encode(jpg).decode()}, headers=auth(1))
+    got = await client.get(f"/api/share/card/{r.json()['id']}.png")
+    assert got.headers["content-type"] == "image/jpeg"
     bad = await client.post("/api/share/card", json={"png_base64": base64.b64encode(b"GIF89a").decode()},
                             headers=auth(1))
     assert bad.status_code == 422

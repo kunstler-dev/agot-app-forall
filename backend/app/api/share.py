@@ -23,6 +23,7 @@ log = logging.getLogger("fandom.share")
 router = APIRouter(prefix="/api/share")
 
 PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
+JPEG_MAGIC = b"\xff\xd8\xff"
 MAX_CARD_BYTES = 1_500_000
 
 
@@ -36,7 +37,7 @@ async def upload_card(body: CardIn, u: Player, s: Session) -> dict:
         data = base64.b64decode(body.png_base64.split(",")[-1], validate=True)
     except (binascii.Error, ValueError):
         raise HTTPException(422, "bad_png") from None
-    if not data.startswith(PNG_MAGIC) or len(data) > MAX_CARD_BYTES:
+    if not data.startswith((PNG_MAGIC, JPEG_MAGIC)) or len(data) > MAX_CARD_BYTES:
         raise HTTPException(422, "bad_png")
     card = ShareCard(id=secrets.token_hex(12), user_id=u.id, png=data, created_ms=now_ms())
     s.add(card)
@@ -50,7 +51,8 @@ async def get_card(card_id: str, request: Request) -> Response:
         card = await s.get(ShareCard, card_id)
     if card is None:
         raise HTTPException(404)
-    return Response(card.png, media_type="image/png", headers={"Cache-Control": "public, max-age=86400"})
+    kind = "image/png" if card.png.startswith(PNG_MAGIC) else "image/jpeg"
+    return Response(card.png, media_type=kind, headers={"Cache-Control": "public, max-age=86400"})
 
 
 class PrepareIn(BaseModel):
