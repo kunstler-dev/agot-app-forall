@@ -45,6 +45,8 @@ def event_out(e: PredictionEvent, mine: int | None, cnt: dict[int, int], now: in
 
 @router.get("")
 async def list_events(u: Player, s: Session, tenant: TenantDep) -> dict:
+    if not tenant.features.predictions:
+        raise HTTPException(404, "predictions_disabled")
     now = now_ms()
     events = (await s.execute(select(PredictionEvent).where(PredictionEvent.status != "cancelled")
                               .order_by(PredictionEvent.deadline_ms.desc()))).scalars().all()
@@ -63,6 +65,8 @@ class VoteIn(BaseModel):
 
 @router.post("/{event_id}/vote")
 async def vote(event_id: int, body: VoteIn, u: Player, s: Session, tenant: TenantDep) -> dict:
+    if not tenant.features.predictions:
+        raise HTTPException(404, "predictions_disabled")
     now = now_ms()
     e = await s.get(PredictionEvent, event_id)
     if e is None or e.status == "cancelled":

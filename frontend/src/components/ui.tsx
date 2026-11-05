@@ -29,7 +29,7 @@ export function Tile({ art, tag, tagTone = 'gilt', title, text, onClick, active,
   return (
     <button type="button" onClick={() => { haptic('light'); onClick?.() }}
       className={`press relative flex flex-col overflow-hidden rounded-2xl border-2 bg-paper-2 text-left ${active ? 'border-gilt' : 'border-rule'} ${className}`}>
-      <div className="h-[92px] w-full overflow-hidden [&>svg]:h-full [&>svg]:w-full">{art}</div>
+      <div className="h-[92px] w-full overflow-hidden ">{art}</div>
       <div className="flex flex-col gap-1 p-3">
         {tag && <Tag tone={tagTone}>{tag}</Tag>}
         <span className="text-[15px] leading-tight font-extrabold">{title}</span>

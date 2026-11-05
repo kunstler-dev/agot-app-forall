@@ -4,7 +4,7 @@ import { useHeraldry } from '../heraldry/store'
 import { api, type Config, type Me } from '../lib/api'
 import { setTexts } from '../lib/texts'
 
-export type Tab = 'today' | 'predictions' | 'map' | 'profile'
+export type Tab = 'today' | 'geo' | 'predictions' | 'map' | 'chat' | 'profile'
 export type Overlay = 'quiz' | 'about' | 'admin' | null
 
 type State = {

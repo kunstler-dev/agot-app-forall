@@ -12,5 +12,5 @@ export function Crest({ blazon, size = 64, engraved = false, fade = 1, className
   if (!blazon) return <div style={{ width: size, height: h }} className={`border border-rule ${className}`} />
   const img = crestImageUrl(blazon)
   if (img) return <img src={img} alt="" width={size} height={h} style={{ width: size, height: h, opacity: fade }} className={`shrink-0 object-contain ${engraved ? 'grayscale' : ''} ${className}`} />
-  return <div className={`shrink-0 [&>svg]:h-full [&>svg]:w-full ${className}`} style={{ width: size, height: h }} dangerouslySetInnerHTML={{ __html: html }} />
+  return <div className={`shrink-0  ${className}`} style={{ width: size, height: h }} dangerouslySetInnerHTML={{ __html: html }} />
 }

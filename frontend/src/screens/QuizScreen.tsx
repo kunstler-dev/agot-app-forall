@@ -102,7 +102,7 @@ export function QuizScreen({ onboarding = false, onDone }: { onboarding?: boolea
           </motion.div>
         ) : step < 0 ? (
           <div className="flex flex-1 flex-col justify-center gap-5">
-            <div className="h-[150px] overflow-hidden rounded-2xl border border-rule [&>svg]:h-full [&>svg]:w-full"><Art name="castle" /></div>
+            <div className="h-[150px] overflow-hidden rounded-2xl border border-rule "><Art name="castle" /></div>
             <h1 className="sc m-0 text-2xl leading-tight font-medium">{q.title}</h1>
             <p className="dropcap m-0 text-base">{onboarding && cfg.tenant.welcome ? `${cfg.tenant.welcome} ` : ''}{q.intro}</p>
             <div className="flex gap-1.5 py-1">

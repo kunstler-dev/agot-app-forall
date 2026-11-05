@@ -1,4 +1,4 @@
-export type ArtName = 'castle' | 'raven' | 'archive' | 'ship' | 'wyrm' | 'hood' | 'shield' | 'crown'
+export type ArtName = 'castle' | 'raven' | 'archive' | 'ship' | 'wyrm' | 'hood' | 'shield' | 'crown' | 'moon' | 'knight'
 
 /** Picks an illustration for any string (an event tag, an id) so the same thing always gets the same picture. */
 export function artFor(key: string): ArtName {

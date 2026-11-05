@@ -45,6 +45,7 @@ export type Tenant = {
   daily: { max_attempts: number; hint_quote_after: number; hint_crest_after: number; crest_attempts: number }
   app_link: string
   disclaimer: string
+  features: { predictions: boolean; chat: boolean }
 }
 export type HouseRef = { id: string; name: string; words: string; region: string; seat: string; great: boolean; crest: Blazon }
 export type MapMeta = { file: string; width: number; height: number; title: string }
@@ -182,6 +183,7 @@ export type AdminStats = {
   share_kinds: Record<string, number>
   houses: Record<string, number>
 }
+export type ChatMessage = { id: number; text: string; ms: number; me: boolean; user: { id: number; name: string; photo_url: string | null; house: string | null } }
 export type ContentKind = 'characters' | 'houses' | 'locations' | 'clues'
 export type ShareKind = 'share_daily' | 'share_crest' | 'share_quiz' | 'share_geo'
 
@@ -214,6 +216,11 @@ export const api = {
   geoDaily: () => request<GeoDaily>('/geo/daily'),
   geoShare: (id: number) => request<{ text: string }>(`/geo/${id}/share`),
 
+  chat: (after = 0) => request<{ messages: ChatMessage[]; banned: boolean; max_length: number }>(`/chat${after ? `?after=${after}` : ''}`),
+  chatSend: (text: string) => post<ChatMessage>('/chat', { text }),
+  chatDelete: (id: number) => request<{ ok: boolean }>(`/chat/${id}`, { method: 'DELETE' }),
+  chatBan: (userId: number, banned = true) => post<{ ok: boolean }>(`/chat/ban/${userId}`, { banned }),
+
   shareCard: (png_base64: string) => post<{ id: string }>('/share/card', { png_base64 }),
   sharePrepare: (kind: ShareKind, text: string, card_id?: string) =>
     post<{ prepared_id: string | null; fallback_url: string; text: string }>('/share/prepare', { kind, text, card_id }),
@@ -243,6 +250,11 @@ export function errorText(e: unknown): string {
       subscription_required: 'Нужна подписка на канал',
       unknown_character: 'Такого персонажа нет в архиве',
       unknown_house: 'Такого дома нет в архиве',
+      too_fast: 'Не так быстро: подождите пару секунд',
+      no_links: 'Ссылки и упоминания в чате запрещены',
+      chat_banned: 'Администратор закрыл вам чат',
+      too_long: 'Слишком длинное сообщение',
+      empty: 'Пустое сообщение',
     }
     if (typeof e.detail === 'string') return map[e.detail] ?? e.detail
     return 'Ошибка проверки данных'

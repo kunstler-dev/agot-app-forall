@@ -11,6 +11,7 @@ from fastapi.responses import FileResponse
 
 from . import jobs
 from .api.admin import router as admin_router
+from .api.chat import router as chat_router
 from .api.daily import router as daily_router
 from .api.geo import router as geo_router
 from .api.predictions import router as predictions_router
@@ -88,7 +89,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.content = base_content
     app.state.gate_problem = None
     for r in (api_router, daily_router, quiz_router, predictions_router, top_router, geo_router, share_router,
-              admin_router):
+              admin_router, chat_router):
         app.include_router(r)
 
     @app.post("/bot/webhook", include_in_schema=False)

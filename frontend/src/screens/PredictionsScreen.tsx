@@ -24,7 +24,7 @@ function Entry({ e, onVote }: { e: PEvent; onVote: (id: number, opt: number) => 
   const resolved = e.status === 'resolved'
   return (
     <article className="mb-3 overflow-hidden rounded-2xl border border-rule bg-paper-2">
-      <div className="relative h-[84px] overflow-hidden [&>svg]:h-full [&>svg]:w-full">
+      <div className="relative h-[84px] overflow-hidden ">
         <Art name={artFor(e.tag || e.question)} />
         <div className="absolute top-2.5 left-3 flex gap-1.5">
           {e.tag && <Tag>{e.tag}</Tag>}
@@ -142,7 +142,7 @@ export function PredictionsScreen() {
       <Title sub={t('predictions.subtitle')}>{t('predictions.title')}</Title>
       <Tabs value={view} onChange={setView} options={[['events', 'События'], ['top', 'Рейтинг']]} />
       {view === 'top' && (
-        <Panel className="relative h-[96px] overflow-hidden [&>svg]:h-full [&>svg]:w-full">
+        <Panel className="relative h-[96px] overflow-hidden ">
           <Art name="crown" />
           <span className="sc absolute bottom-2.5 left-4 text-xl text-ink">рейтинг канала</span>
         </Panel>

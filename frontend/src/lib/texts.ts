@@ -3,6 +3,8 @@
 const DEFAULTS = {
   'tab.today': 'Сегодня',
   'tab.predictions': 'Прогнозы',
+  'tab.geo': 'Где это?',
+  'tab.chat': 'Чат',
   'tab.map': 'Карта',
   'tab.profile': 'Профиль',
   'gate.title': 'Вход для подписчиков',

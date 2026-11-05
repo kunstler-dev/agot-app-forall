@@ -67,7 +67,7 @@ export function ProfileScreen() {
   return (
     <div className="flex flex-col gap-4 px-4 pt-4 pb-10 safe-top">
       <header className="relative overflow-hidden rounded-2xl border border-rule">
-        <div className="h-[120px] [&>svg]:h-full [&>svg]:w-full"><Art name="castle" /></div>
+        <div className="h-[120px] "><Art name="castle" /></div>
         <div className="flex items-end gap-3 bg-paper-2 px-4 pb-4">
           <div className="-mt-10"><Avatar name={u.first_name} url={u.photo_url} size={76} /></div>
           <div className="min-w-0 flex-1 pb-1">

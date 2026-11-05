@@ -31,6 +31,8 @@ class User(Base):
     notify_predictions: Mapped[bool] = mapped_column(Boolean, default=True)
     # the bot may write to the user (they pressed /start); without it Telegram rejects messages
     bot_started: Mapped[bool] = mapped_column(Boolean, default=False)
+    # an admin removed the right to write in the chat
+    chat_banned: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class ActivityDay(Base):
@@ -177,6 +179,18 @@ class AnalyticsEvent(Base):
     meta: Mapped[str] = mapped_column(String(64), default="")
 
 
+class ChatMessage(Base):
+    """The common chat of the channel's players."""
+
+    __tablename__ = "chat_messages"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    text: Mapped[str] = mapped_column(Text)
+    created_ms: Mapped[int] = mapped_column(BigInteger, index=True)
+    deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
 class JobRun(Base):
     """Idempotency key for broadcasts: one row per (job, period)."""
 
@@ -199,4 +213,4 @@ class ShareCard(Base):
 
 __all__ = ["User", "ActivityDay", "DailyPuzzle", "DailyPlay", "DailyStats", "QuizResult", "PredictionEvent",
            "PredictionVote", "PointAward", "GeoSession", "ContentOverride", "AnalyticsEvent", "JobRun",
-           "ShareCard"]
+           "ShareCard", "ChatMessage"]

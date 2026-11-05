@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
 import { NovaMark } from '../components/Nova'
@@ -5,6 +6,25 @@ import { Rubric, Title } from '../components/ui'
 import { bindBack, openExternal, openTelegram } from '../lib/telegram'
 import { t } from '../lib/texts'
 import { useApp } from '../store/app'
+
+type Credit = { file: string; title: string; artist: string; date: string; source: string; license: string }
+
+function ArtCredits() {
+  const q = useQuery({ queryKey: ['art-credits'], queryFn: async () => (await fetch('/art/credits.json')).json() as Promise<Credit[]>, staleTime: Infinity })
+  if (!q.data?.length) return null
+  return (
+    <section>
+      <Rubric>Иллюстрации</Rubric>
+      <p className="mt-2 mb-2 text-xs text-ink-muted">Работы из общественного достояния (CC0), коллекция Art Institute of Chicago.</p>
+      {q.data.map((c) => (
+        <button key={c.file} type="button" onClick={() => openExternal(c.source)} className="rule-b flex w-full gap-3 py-2 text-left">
+          <img src={`/art/${c.file}`} alt="" className="h-10 w-14 shrink-0 rounded-md object-cover" />
+          <span className="min-w-0 text-xs"><span className="block font-extrabold">{c.title}</span><span className="block text-ink-muted">{c.artist}, {c.date}</span></span>
+        </button>
+      ))}
+    </section>
+  )
+}
 
 export function AboutScreen({ onClose }: { onClose: () => void }) {
   const cfg = useApp((s) => s.config)!
@@ -37,6 +57,7 @@ export function AboutScreen({ onClose }: { onClose: () => void }) {
             ))}
           </section>
         )}
+        <ArtCredits />
         {tn.disclaimer && <p className="m-0 border-l-2 border-rule-strong pl-3 text-sm text-ink-muted">{tn.disclaimer}</p>}
         <section className="double-rule-t flex items-start gap-4 pt-4">
           <NovaMark size={44} className="shrink-0 text-ink" />

@@ -45,6 +45,8 @@ async def send_many(app: FastAPI, user_ids: list[int], text: str) -> int:
 
 async def remind_predictions(app: FastAPI, now: int) -> None:
     tenant = app.state.tenant
+    if not tenant.features.predictions:
+        return
     window = tenant.predictions.remind_before_min * 60 * 1000
     async with app.state.db.sessions() as s:
         events = (await s.execute(select(PredictionEvent).where(
@@ -91,7 +93,7 @@ async def cleanup(app: FastAPI, now: int) -> None:
 async def seed_events(app: FastAPI) -> None:
     """Demo prediction events from content/events.json, only into an empty table."""
     content, tenant = app.state.content, app.state.tenant
-    if not content.events:
+    if not content.events or not tenant.features.predictions:
         return
     async with app.state.db.sessions() as s:
         if (await s.execute(select(PredictionEvent.id).limit(1))).first() is not None:

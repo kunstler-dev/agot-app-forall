@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { PanZoom, type View } from '../components/PanZoom'
 import { Button, Radio, Rubric, Sheet, Skeleton } from '../components/ui'
@@ -237,7 +237,7 @@ function MapButton({ icon, label, on, onClick }: { icon: 'shield' | 'quill' | 'c
   )
 }
 
-export function MapScreen() {
+export function MapScreen({ geoStart, onExit }: { geoStart?: 'daily' | 'practice'; onExit?: () => void } = {}) {
   const cfg = useApp((s) => s.config)!
   const me = useApp((s) => s.me)!
   const patchUser = useApp((s) => s.patchUser)
@@ -305,6 +305,20 @@ export function MapScreen() {
     }
   }
 
+  // launched from the "Где это?" tab: start right away, leave when the round is closed
+  const started = useRef(false)
+  useEffect(() => {
+    if (geoStart && !started.current) {
+      started.current = true
+      void startGeo(geoStart)
+    }
+  })
+  const exitGeo = () => {
+    setGeo(null)
+    setGuess(null)
+    onExit?.()
+  }
+
   const aiming = !!geo && phase === 'aim' && !geo.finished
   const onTap = useCallback((x: number, y: number) => {
     if (!aiming) return
@@ -317,7 +331,7 @@ export function MapScreen() {
 
   return (
     <div className="relative flex h-full flex-col">
-      {!showGeoPanel && (
+      {!showGeoPanel && !geoStart && (
         <div className="relative z-10 border-b border-rule bg-paper px-4 pt-3 pb-3 safe-top">
           <div className="flex items-baseline justify-between">
             <h1 className="sc m-0 text-lg font-medium">{t('map.title')}</h1>
@@ -328,7 +342,6 @@ export function MapScreen() {
           <div className="mt-2.5 flex gap-2">
             <MapButton icon="shield" label="Дома" on={housesOn} onClick={() => { haptic('light'); setHousesOn(!housesOn) }} />
             <MapButton icon="quill" label="Пути" on={!!path} onClick={() => setPathsOpen(true)} />
-            <MapButton icon="compass" label="Где это?" onClick={() => setGeoMenu(true)} />
           </div>
           {housesOn && data && <div className="num mt-2 text-xs font-bold text-ink-muted">Игроков в домах: {data.houses.total}</div>}
           {path && data && !housesOn && (
@@ -359,7 +372,7 @@ export function MapScreen() {
         )}
         {showGeoPanel && geo && (
           <GeoPanel session={geo} guess={guess} showingResult={phase === 'result'} busy={busy} onConfirm={confirm}
-            onNext={() => setPhase('aim')} onClose={() => { setGeo(null); setGuess(null) }} />
+            onNext={() => setPhase('aim')} onClose={exitGeo} />
         )}
       </div>
 
@@ -455,7 +468,7 @@ export function MapScreen() {
         )}
       </Sheet>
 
-      <Sheet open={finishOpen} onClose={() => { setFinishOpen(false); setGeo(null) }} title="Итог">
+      <Sheet open={finishOpen} onClose={() => { setFinishOpen(false); exitGeo() }} title="Итог">
         {geo && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={ease} className="flex flex-col gap-4">
             <p className="num m-0 text-xl">{geo.total} <span className="text-base text-ink-muted">из {geo.max_score * geo.rounds}</span></p>
@@ -473,7 +486,7 @@ export function MapScreen() {
             </table>
             <Button kind="secondary" icon="seal" onClick={async () => shareResult('share_geo', (await api.geoShare(geo.id)).text)}>Отправить</Button>
             {geo.mode === 'daily' && geoDaily.data && <Leaderboard data={{ period: 'day', scope: 'geo', season_label: '', top: geoDaily.data.top, me: { rank: null, points: geo.total } }} emptyText="" />}
-            <Button kind="link" onClick={() => { setFinishOpen(false); setGeo(null) }}>К карте</Button>
+            <Button kind="link" onClick={() => { setFinishOpen(false); exitGeo() }}>{onExit ? 'Готово' : 'К карте'}</Button>
           </motion.div>
         )}
       </Sheet>

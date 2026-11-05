@@ -69,6 +69,20 @@ class GeoCfg(BaseModel):
     leagues_per_unit: float = 1.0
 
 
+class Features(BaseModel):
+    """Modules a tenant can switch off without touching code."""
+
+    predictions: bool = True
+    chat: bool = True
+
+
+class ChatCfg(BaseModel):
+    max_length: int = 500
+    # minimum seconds between two messages of one player
+    cooldown_s: int = 3
+    history: int = 80
+
+
 class BotCfg(BaseModel):
     start_text: str = "Добро пожаловать! Жми кнопку, чтобы открыть приложение."
     button: str = "Открыть"
@@ -95,6 +109,8 @@ class Tenant(BaseModel):
     daily: DailyCfg = DailyCfg()
     predictions: PredictionsCfg = PredictionsCfg()
     geo: GeoCfg = GeoCfg()
+    features: Features = Features()
+    chat: ChatCfg = ChatCfg()
     # Link that shares open, e.g. https://t.me/<bot>/<app>; empty = https://t.me/<bot>?startapp=share
     app_link: str = ""
     disclaimer: str = ""
